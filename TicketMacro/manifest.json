@@ -1,0 +1,25 @@
+{
+    "manifest_version": 2,
+  
+    "name": "TICKET Macro",
+    "description": "지인 배포만 가능합니다",
+    "version": "0.0.1",
+    
+    "permissions": [
+      "tabs",
+      "storage",
+      "<all_urls>",
+      "activeTab",
+      "https://*/",
+      "http://*/"
+    ],
+    "background" : {
+      "scripts" : ["background.js"],
+      "persistent" : false
+    },
+    "browser_action": {
+      "default_icon": "icons.png",
+      "default_popup": "popup.html"
+    },
+    "web_accessible_resources": ["content.js"]
+}
