@@ -10,14 +10,23 @@ test.addEventListener("click", macroTest);
 
 function content_start() {
     target_url = url_dom.value;
-    chrome.runtime.sendMessage({greeting:"Interpark",status:"Start",url:target_url});
+    chrome.runtime.sendMessage({site:"Interpark",status:"Start",url:target_url});
 }
 
 function macroTest() {
-    chrome.runtime.sendMessage({greeting:"Interpark",status:"Test"});
+    chrome.runtime.sendMessage({site:"Interpark",status:"Test"});
+    /*
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        chrome.tabs.sendMessage(tabs[0].id,{site:"Interpark",status:"Test"});
+    });
+    */
 }
 
-
+chrome.runtime.onMessage.addListener(function (request,sender,sendRespone) {
+    chrome.tabs.executeScript({
+        code: "console.log('popup message :',"+request.toString()+");",
+    });
+})
 
 function onChangeUrl(event) {
     localStorage.setItem('target_url',event.target.value);

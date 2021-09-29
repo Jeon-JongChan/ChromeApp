@@ -1,38 +1,50 @@
 
 let _dom=null;
+console.log("Background 메세지 작동");
 chrome.runtime.onMessage.addListener(async function (request,sender,sendRespone) {
     console.log("background - is message : ",request," sender : ",sender);
-    if(request.greeting=='Interpark') {
-        console.log("인터파크 매크로 메세지 수신")
-        if(request.status=='Start') {
-            console.log("인터파크 메세지 첫 시작");
+    if(request.site=='Interpark') {
+        if(request.status==='Start') {
             changeUrl(request.url);
-            let dom_popup = await getDom("#popup-prdGuide");
-            if(dom_popup) {
-                domClassRemove("#popup-prdGuide","is-visible");
-                console.log("classlist : ",dom_popup.classList);
-            }
+            await sleep(2000);
+            sendStatusMessage("Interpark","Step1");
+        } else if (request.status==='Step2') {
+            console.log("Background - Step2 : sheet select");
+            await sleep(2000);
+            sendStatusMessage("Interpark","Step2");
+        } else if (request.status==='Step3') {
+            console.log("Background - Step3 : pay select");
+            await sleep(2000);
+            sendStatusMessage("Interpark","Step3");
+        } else if (request.status==='Step4') {
+            console.log("Background - Step4 : address select");
+            await sleep(2000);
+            sendStatusMessage("Interpark","Step4");
         }
-
         if(request.status=='Test') {
-            console.log("TEST : ",_dom);
-            getDom("#popup-prdGuide");
+            sendStatusMessage("Interpark","Func Test");
         }
     }
-
 })
 
-async function getDom(id) {
-    let ret = await syncExecScript("document.querySelector('"+id+"')")
-    //console.log("getDom : ",_dom," ret : ",ret);
-    return ret;
+function sendStatusMessage(site,status) {
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        console.log("sendStatusMessage tab :",tabs);
+        chrome.tabs.sendMessage(tabs[0].id,{site:site,status:status});
+    });
 }
-async function domClassRemove(id,className) {
-    console.log("document.querySelector('"+id+"').remove()");
-    //let ret = await syncExecScript("document.querySelector('"+id+"').classList.remove('"+className+"')");
-    let ret = await syncExecScript("document.querySelector('"+id+"').remove(); document.querySelector('"+id+"')");
-    return true;
+
+function changeUrl (target_url, tab_id=undefined) {
+    chrome.tabs.update(tab_id,{url:target_url});
 }
+
+function sleep(ms) {
+    return new Promise((resolve) => {
+        setTimeout(resolve, ms);
+    })
+}
+
+/* 일단 사용 안함
 function syncExecScript(codeString) {
     return new Promise ((resolve) => {    
         chrome.tabs.executeScript({code: codeString,}, closureReturnDom);
@@ -44,9 +56,22 @@ function closureReturnDom(domObject) {
     console.log("전달받은 결과값 : ",domObject);
     _dom = domObject[0];
 }
-function changeUrl (target_url, tab_id=undefined) {
-    chrome.tabs.update(tab_id,{url:target_url});
+*/ 
+
+/* 사용안하는 함수
+async function getDom(id) {
+    let ret = await syncExecScript("document.querySelector('"+id+"')")
+    //console.log("getDom : ",_dom," ret : ",ret);????????
+    return ret;
 }
+async function domClassRemove(id,className) {
+    console.log("document.querySelector('"+id+"').remove()");
+    //let ret = await syncExecScript("document.querySelector('"+id+"').classList.remove('"+className+"')");
+    let ret = await syncExecScript("document.querySelector('"+id+"').remove(); document.querySelector('"+id+"')");
+    return true;
+}
+*/
+
 /*
 function (result) {
         console.log("내부 클로져 결과값 : ",result);
