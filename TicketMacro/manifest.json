@@ -21,9 +21,12 @@
       "matches": ["http://*/*", "https://*/*"],
       "js": ["content.js"]
     }],
+    "web_accessible_resources": [
+      "public.js",
+      "macro/*"
+    ],
     "browser_action": {
       "default_icon": "icons.png",
       "default_popup": "popup.html"
-    },
-    "web_accessible_resources": ["content.js"]
+    }
 }
