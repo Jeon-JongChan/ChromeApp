@@ -1,4 +1,6 @@
 let public, interpark;
+
+let progressStatus = 'interactive';
 async function srcImport(srcStr) {
     const src = chrome.extension.getURL(srcStr); 
     const ret = await import(src);
@@ -25,27 +27,23 @@ chrome.runtime.onMessage.addListener(async function (request,sender,sendRespone)
     console.log("Content Message Receive. request",request);
     if(request.site=='Interpark') {
         await saveSrc('Interpark');
-        readyMacro(request);
+        macro_start(request);
     }
 })
-// status : loading, interactive, complete
-function readyMacro(request) {
+// loading, interactive, complete
+function macro_start(request) {
     console.log("dom status :",document.readyState);
-    if(document.readyState === 'complete') {
-        macro_start(request);
+    if(document.readyState == 'interactive' || document.readyState == 'complete') {
+        interpark.interparkMacro(request);
     }
     else (
         document.addEventListener('readystatechange', async event => {
-            if (event.target.readyState === 'complete') {
-                macro_start(request);
+            if (event.target.readyState === 'interactive') {
+                interpark.interparkMacro(request);
             }
         })
     )
-}
-
-function macro_start(request) {
-    console.log("log : Dom Loading Complete")
-    interpark.interparkMacro(request);
+    
 }
 
 

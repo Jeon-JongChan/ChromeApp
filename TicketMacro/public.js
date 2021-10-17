@@ -1,4 +1,4 @@
-export {asyncGetDom, asyncGetDomAll, regExp, sleep, statusLog};
+export {asyncGetDom, asyncGetDomAll, regExp, sleep, statusLog, multiRemoveTxt};
 
 function statusLog(status, msg) {
     console.log(status," - ",msg);
@@ -6,14 +6,22 @@ function statusLog(status, msg) {
 // let reg = new RegExp("(SelectSeat\()[\s\S]+\)", "g");
 function regExp(exp, str) {
     let reg = new RegExp(exp, "g");
-    console.log("regExp : ",exp,reg.exec(str));
-    return reg.exec(str);
+    let reg_result = reg.exec(str);
+    console.log("regExp : ",reg_result);
+    return reg_result[0];
 }
 
 function sleep(ms) {
     return new Promise((resolve) => {
         setTimeout(resolve, ms);
     })
+}
+
+function multiRemoveTxt(string, txt1, txt2=null, txt3=null) {
+    string = string.replaceAll(txt1,'');
+    if(txt2) string = string.replaceAll(txt2,'');
+    if(txt3) string = string.replaceAll(txt3,'');
+    return string;
 }
 
 async function asyncGetDom(id, iframe1=undefined, iframe2=undefined, iframe3=undefined) {

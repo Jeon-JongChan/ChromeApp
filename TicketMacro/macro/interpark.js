@@ -1,4 +1,4 @@
-import {sleep, statusLog, asyncGetDom, asyncGetDomAll, regExp} from "../public.js";
+import {sleep, statusLog, asyncGetDom, asyncGetDomAll, regExp, multiRemoveTxt} from "../public.js";
 export {interparkMacro};
 
 async function interparkMacro(request) {
@@ -30,8 +30,9 @@ async function interparkMacro(request) {
         let iframe = await asyncGetDom('#ifrmSeat');
         if(iframe) {
             interparkRecapRemove(request.status);
-            interparkSeatList(request.status);
-            interparkSeatSummit(request.status);
+            let data = await interparkSeatList();
+            console.log(data);
+            interparkSeatSummit(data);
             //let sheetList = iframe.contentDocument.querySelector('#ifrmSeatDetail').contentDocument.querySelectorAll('#TmgsTable img:not(#MainMap)');
             //let sheetNextBtn = iframe.contentDocument.querySelector('#NextStepImage');
             //sheetList[0].click();
@@ -75,40 +76,110 @@ async function interparkRecapRemove() {
 }
 
 async function interparkSeatList() {
-    let seatList = await asyncGetDomAll('#TmgsTable img:not(#MainMap)','#ifrmSeat','#ifrmSeatDetail');
+    //img:not(#MainMap)
+    let seatList = await asyncGetDomAll('#TmgsTable .stySelectSeat','#ifrmSeat','#ifrmSeatDetail');
     statusLog('Step2',"좌석 정보 저장을 시작합니다.");
-    console.log(seatList);
+    //console.log(seatList);
     //document.querySelector('#ifrmSeat').contentDocument.querySelector('#ifrmSeatDetail').contentDocument.querySelectorAll('#TmgsTable img:not(#MainMap)');
     let seatBuffer = {
         seat : new Array(),
         data : new Array(),
+        detail : new Array()
     }
 
-    for(let idx=0; idx<1; idx++) {
+    for(let idx=0; idx<10; idx++) {
         let seat = seatList[idx];
         let outerHTML = seat.outerHTML.toString();
         let reg = regExp('(SelectSeat\\()[\\s\\S]+\\)',outerHTML);
-        console.log('Step2',"TEST SEAT REGEXP : ",reg);
-        let seat_obj = parseSeat(reg[0]);
+        let seatData = parseSeat(reg);
+        let seatDetail = [];
+        seatDetail.push(seatData[2].replace('층',''));
+        seatDetail.push(seatData[3].replace('열','').split('구역'));
         seatBuffer.seat.push(seat);
-
+        seatBuffer.data.push(seatData);
+        seatBuffer.detail.push(seatDetail);
+        //console.log('Step2',"TEST SEAT REGEXP : ",reg);
+        //console.log(seatData,seatDetail);
     }
+    return seatBuffer;
 }
 function parseSeat(rowdata) {
-    rowdata = rowdata.replaceAll('SelectSeat(','');
-    rowdata = rowdata.replaceAll(')','');
-    return rowdata.split(',');
+    rowdata = multiRemoveTxt(rowdata,'SelectSeat(',')',"'");
+    rowdata = multiRemoveTxt(rowdata,' ');
+    rowdata = rowdata.split(',');
+    return rowdata;
 }
+async function interparkSeatPriority(data) {
+    let seatLimit = 1;
+    let ret = new Array();
 
-async function interparkSeatSummit() {
+    for(let i=0; i < data.length; i++) {
+        if(ret.length >= seatLimit) break;
+        let detail = data[i].detail;
+        if(detail[0] == 1) {
+            if(seatPriorityCheck(detail[1])) ret.push(data[i].data);
+        }
+        else if(detail[0] == 2) {
+            if(seatPriorityCheck(detail[1],1)) ret.push(data[i].data);
+        }
+    }
+    return ret;
+}
+function seatPriorityCheck(pos, checkCnt=6) {
+    let prioriy = [['B',3],['C',3],['A',3],['B',6],['C',6],['A',6]];
+
+    for(let i=0; i<checkCnt; i++) {
+        let startCol = prioriy[i][1]-2;
+        if(pos[0] === prioriy[i][0]) {
+            if(pos[1] >= startCol && pos[1] <= prioriy[i][1]) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+async function interparkSeatSummit(data) {
     let iframe = (await asyncGetDom('#ifrmSeat')).contentDocument;
     let ifrmSeatDetail = (await asyncGetDom('#ifrmSeatDetail','#ifrmSeat')).contentDocument;
+
+    let selectSeats = await interparkSeatPriority(data);
+    console.log("PlaySeq data : ",document.querySelector('#PlaySeq').value);
+    if(selectSeats.length == 0) {
+        alert("선택할 좌석이 존재하지 않습니다");
+        return null;
+    }
     if(iframe && ifrmSeatDetail) {
         statusLog('Step2',"좌석 정보를 업그레이드 합니다.");
         let playseq = iframe.querySelector('#PlaySeq');
         let seatList = ifrmSeatDetail.querySelectorAll('#TmgsTable img:not(#MainMap)');
-        console.log(seatList[0]);
+        //console.log(seatList[0]);
     }
+}
+function fnSetPointDiscount(SeatBuffer){
+    SelectAble = false;
+        //선블럭킹 확인
+
+    var SeatGrade = "";
+    var Floor = "";
+    var RowNo = "";
+    var SeatNo = "";
+
+    for(i=0;i<SeatBuffer.index;i++){
+        o = SeatBuffer.pop(i);
+        SeatGrade = SeatGrade + "" + o.SeatGrade + "^";
+        Floor = Floor + "" + o.Floor + "^";
+        RowNo = RowNo + "" + o.RowNo + "^";
+        SeatNo = SeatNo + "" + o.SeatNo + "^";
+    }
+    $("frmInfo").Flag.value = "Blocking";
+    $("frmInfo").PlaySeq.value = $F("PlaySeq");
+    $("frmInfo").SeatCnt.value = SeatBuffer.index;
+    $("frmInfo").SeatGrade.value = SeatGrade;
+    $("frmInfo").Floor.value = Floor;
+    $("frmInfo").RowNo.value = RowNo;
+    $("frmInfo").SeatNo.value = SeatNo;
+    $("frmInfo").submit();
+
 }
 //콘텐츠에 해당 스크립트 동적삽입 -> 함수호출이 컨텐츠에서 가능해짐
 function make_script() {
