@@ -1,0 +1,46 @@
+.frame {
+    display:flex;
+    flex-direction: row;
+    min-height: 200px;
+}
+article {
+    display: inline-block;
+    width: 50%;
+}
+.article-center {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.add-poketmon {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+.list-header {
+    text-align: center;
+}
+.poketmon-list {
+    display: flex;
+    flex-direction: row;
+}
+.poketmon {
+    text-align: left;
+    margin: 0 10px;
+}
+.poket-img {
+    height: 60px;
+    width: 60px;
+}
+.additem {
+    display: flex;
+    flex-direction: row;
+  }
+  .input-file {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .add-header {
+    margin: 0 10px 0 0;
+  }

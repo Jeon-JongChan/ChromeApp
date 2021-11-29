@@ -7,7 +7,7 @@ function statusLog(status, msg) {
 function regExp(exp, str) {
     let reg = new RegExp(exp, "g");
     let reg_result = reg.exec(str);
-    console.log("regExp : ",reg_result);
+    //console.log("regExp : ",reg_result);
     return reg_result[0];
 }
 
@@ -84,7 +84,7 @@ async function asyncGetDomAll(id, iframe1=undefined, iframe2=undefined, iframe3=
                     ret = document.querySelector(iframe1).contentDocument.querySelector(iframe2).contentDocument.querySelector(iframe3).contentDocument.querySelectorAll(id);
                     break;
             }
-            if(ret) break;
+            if(ret && ret.length > 0) break;
             else {
                 console.log("get Dom Fail. retry count : ",i+1);
                 await sleep(500);

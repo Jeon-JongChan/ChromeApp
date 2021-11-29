@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>포켓몬 랜덤 페이지</title>
+    <link rel="stylesheet" type="text/css" href="css/admin.css">
+    <script src="data.js" type="text/javascript"></script>
+    <script src="js/public.js" type="text/javascript"></script>
+    <script src="js/firebase.js" type="text/javascript"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-analytics.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-storage.js"></script>
+    <script>
+      firebase.initializeApp(firebaseConfig);
+      const database = firebase.database();
+      const storage = firebase.storage();
+    </script>
+    <style>
+      #main {
+        min-height: 800px;
+      }
+      .generator {
+        width: 100%;
+      }
+      .half-div {
+        width: 49.5%;
+        display:inline-block;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="main">
+      <div class="selected">
+        <label for="selected-poketmon">선택받은 포켓몬</label>
+        <input id="selected-poketmon" type="text" value="">
+      </div>
+      <div class="youtube">
+        <label for="youtube-url">첨부할 유투브 음악 주소</label>
+        <input id="youtube-url" type="text" value="youtu.be/Q9qzH58HtHM">
+      </div>
+      <div class="plevel">
+        <label for="plevel-min">레벨 최소 범위</label>
+        <input id="plevel-min" type="number" value="1">
+        <label for="plevel-max">레벨 최대 범위</label>
+        <input id="plevel-max" type="number" value="50">
+      </div>
+
+      <div class="poketmon-selector half-div">
+        <button class="generator" onclick="genPoketSelector()">포켓몬 랜덤 생성기</button>
+        <div class="poketmon-select">
+          <p>
+            <span class="music"></span><br>
+            야생의 포켓몬이 나타났어. 로토...<br><br>
+            ...누구를 리서치 해볼까 로토?<br>
+            &#9654;<span class="poket1">돌살이</span><br>
+            &#9654;<span class="poket2">끼리동</span><br>
+          </p>
+          <img id="poket1-img" width="49%" src="">
+          <img id="poket2-img" width="49%" src="">
+        </div>
+      </div>
+      <div class="poketmon-battler half-div">
+        <button class="generator" onclick="genPoketBattle()">포켓몬 전투 대사 생성기</button>
+        <div class="poketmon-battle">
+          <p>
+            <span class="music"></span><br><br>
+            야생의 <span class="pname"></span>이 나타났어.<br><br>
+            Lv.&nbsp;<span class="plevel"></span>&nbsp;[&nbsp;<span class="pspec"></span>&nbsp;]<br><br>
+            마키는 무엇을 할까?<br><br>
+            &#9654; 싸운다<br>
+            &#9654; 대화한다(프렌드볼 전용)<br>
+            &#9654; 몬스터볼<br>
+            &#9654; 도망친다<br>
+          </p>
+          <img id="poket-img" width="100%">
+        </div>
+      </div>
+      <script>
+        console.log("main :",json);
+        async function genPoketSelector() {
+          console.log("포켓몬 랜덤 생성 작동");
+          let selector = document.querySelector(".poketmon-select");
+          let youtube_url = document.querySelector("#youtube-url").value;
+
+          // let plevel = document.querySelector(".plevel");
+          // let minlevel = plevel.querySelector("plevel-min").value;
+          // let maxlevel = plevel.querySelector("plevel-max").value;
+          let poket1 = randomPoketmon();
+          let poket2 = randomPoketmon(poket1);
+
+          selector.querySelector(".music").innerText=youtube_url;
+          selector.querySelector(".poket1").innerText=json.poketmon.name[poket1];
+          selector.querySelector("#poket1-img").src=await firebaseGetFileUrl(json.poketmon.image[poket1]);
+          selector.querySelector(".poket2").innerText=json.poketmon.name[poket2];
+          selector.querySelector("#poket2-img").src=await firebaseGetFileUrl(json.poketmon.image[poket2]);
+        }
+        async function genPoketBattle() {
+          console.log("포켓몬 전투 작동");
+          let parent = document.querySelector(".poketmon-battle");
+          let youtube_url = document.querySelector("#youtube-url").value;
+          let poketname = document.querySelector("#selected-poketmon").value;
+          let poket_idx = json.poketmon.name.indexOf(poketname);
+          if(poket_idx === -1) alert("포켓몬 이름이 이상합니다.");
+
+
+          let plevel = document.querySelector(".plevel");
+          let minlevel = plevel.querySelector("#plevel-min").value;
+          let maxlevel = plevel.querySelector("#plevel-max").value;
+          let level = getRandomInt(minlevel, maxlevel);
+          let spec = getRandomValue(json.spec.name);
+
+          parent.querySelector(".music").innerText=youtube_url;
+          parent.querySelector(".pname").innerText=poketname;
+          parent.querySelector(".plevel").innerText=level;
+          parent.querySelector(".pspec").innerText=spec;
+          parent.querySelector("#poket-img").src=await firebaseGetFileUrl(json.poketmon.image[poket_idx]);
+
+        }
+        function randomPoketmon(except=null)
+        {
+          let ret = getRandomInt(0, json.poketmon.name.length);
+          while(except !== null && except === ret) {
+            ret = getRandomInt(0, json.poketmon.name.length);
+          }
+          return ret;
+        }
+      </script>
+    </div>
+    <div id="admin">
+      <div class="frame">
+        <article>
+            <h1 class="list-header">포켓몬 리스트</h1>
+            <div class="poketmon-list">
+            </div>
+        </article>
+        <article class="article-center input-item">
+          <section class="add-poketmon">
+            <div class="additem add-poketname">
+              <h2 class="add-header">포켓몬 이름 :</h2>
+              <input id="text-poketmon" type="text"/>
+            </div>
+            <div class="additem add-poketimage">
+              <h2 class="add-header">포켓몬 이미지 :</h2>
+              <div class="input-file">
+                <input id="image-poketmon" type="file"/>
+              </div>
+            </div>
+          </section>
+          <div class="buttons">
+            <button id="add-poketmon-btn" onclick="addPoketmon()">추가</button>
+          </div>
+        </article>
+      </div>
+      <div class="frame">
+        <article class="article-center">
+          <div class="personal-list">
+          </div>
+        </article>
+        <article class="article-center input-item">
+          <section class="add-poketmon">
+            <div class="additem add-personal-name">
+              <h2 class="add-header">포켓몬 특성 :</h2>
+              <input id="text-personal" type="text"/>
+            </div>
+            <div class="additem add-personal-rare">
+              <h2 class="add-header">포켓 희귀도 :</h2>
+              <input id="text-personal-rare" type="number"/>
+            </div>
+          </section>
+          <div class="buttons">
+            <button id="add-personal-btn" onclick="addPersonal()">추가</button>
+          </div>
+        </article>
+      </div>
+      <div class="frame">
+        <article class="article-center">
+          <div class="spec-list">
+          </div>
+        </article>
+        <article class="article-center input-item">
+          <section class="add-poketmon">
+            <div class="additem add-spec-name">
+              <h2 class="add-header">포켓몬 성격 :</h2>
+              <input id="text-spec" type="text"/>
+            </div>
+            <div class="additem add-spec-rare">
+              <h2 class="add-header">성격 희귀도 :</h2>
+              <input id="text-spec-rare" type="number"/>
+            </div>
+          </section>
+          <div class="buttons">
+            <button id="add-spec-btn" onclick="addSpec()">추가</button>
+          </div>
+        </article>
+      </div>
+    </div>
+    
+    <template>
+      <section class="poketmon">
+        <img class="poket-img" src="">
+        <h3></h3>
+      </section>
+      <section class="personal">
+        특성 :&nbsp;<span class="person-name"></span>&nbsp;-&nbsp;
+        희귀도 :&nbsp;<span class="person-rare"></span>
+      </section>
+      <section class="spec">
+        성격 :&nbsp;<span class="spec-name"></span>&nbsp;-&nbsp;
+        희귀도 :&nbsp;<span class="spec-rare"></span>
+      </section>
+    </template>
+    <script>
+      function getJsonData() {
+        var dbTestRef = firebase.database().ref('json/');
+        console.log("ㅎㄷㅅ",json);
+        dbTestRef.on('value', function(data){
+          //console.log("getJsonData : ", json, data.val());
+          if(data.val()) {
+            json=JSON.parse(data.val());//saveGlobalData( JSON.parse(data.val()) );
+            console.log("getJsonData 성공했습니다");
+          }
+        })
+      }
+      
+      async function initAdminPage() {
+        getJsonData();
+        await sleep(1000);
+        let template = document.querySelector("template").content;
+        
+        /*포켓몬 리스트 초기화*/
+        let list = document.querySelector(".poketmon-list");
+        let dom_template = template.querySelector(".poketmon");
+        console.log("포켓몬 리스트 초기화 시작", json);
+        for(var i=0; i<json.poketmon.name.length; i++) {
+          var dom = dom_template.cloneNode(true);
+          var name = json.poketmon.name[i];
+          var image = json.poketmon.image[i];
+
+          dom.querySelector("img").src = await firebaseGetFileUrl(image);
+          dom.querySelector("h3").innerText = name;
+          
+          list.appendChild(dom);
+        }
+        /*특성 리스트 초기화*/
+        list = document.querySelector(".personal-list");
+        dom_template = template.querySelector(".personal");
+        console.log("특성 리스트 초기화 시작", list, dom_template, json.personality);
+        
+        for(var i=0; i<json.personality.name.length; i++) {
+          var dom = dom_template.cloneNode(true);
+          var name = json.personality.name[i];
+          var rare = json.personality.rarity[i];
+
+          dom.querySelector(".person-name").innerText = name;
+          dom.querySelector(".person-rare").innerText = rare;
+          
+          list.appendChild(dom);
+        }
+        /*성격 리스트 초기화*/
+        list = document.querySelector(".spec-list");
+        dom_template = template.querySelector(".spec");
+        console.log("성격 리스트 초기화 시작", list, dom_template, json.spec);
+        
+        for(var i=0; i<json.spec.name.length; i++) {
+          var dom = dom_template.cloneNode(true);
+          var name = json.spec.name[i];
+          var rare = json.spec.rarity[i];
+
+          dom.querySelector(".spec-name").innerText = name;
+          dom.querySelector(".spec-rare").innerText = rare;
+          
+          list.appendChild(dom);
+        }
+        console.log();
+      }
+
+      initAdminPage();
+      async function addPoketmon() {
+        if(json == null) {
+          console.log("입력데이터가 없습니다.");
+          getJsonData();
+          await sleep(1000);
+        }
+        let name = document.querySelector('#text-poketmon');
+        let file = document.querySelector('#image-poketmon');
+        let imgPath = 'image/'+name.value;
+        firebaseSaveFile(imgPath, file.files[0]);
+        
+        json.poketmon.name.push(name.value);
+        json.poketmon.image.push(imgPath);
+        firebaseSaveJson(json);
+
+        name.value='';
+        //file.value='';
+        
+        console.log("포켓몬 추가 완료",json);
+      }
+
+      async function addPersonal() {
+        if(json == null) {
+          console.log("입력데이터가 없습니다.");
+          getJsonData();
+          await sleep(1000);
+        }
+        let name = document.querySelector('#text-personal');
+        let rare = document.querySelector('#text-personal-rare');
+        //console.log("test", json);
+        
+        json.personality.name.push(name.value);
+        json.personality.rarity.push(rare.value);
+        firebaseSaveJson(json);
+
+        name.value='';
+        rare.value='';
+        
+        console.log("특성 추가 완료",json);
+      }
+      async function addSpec() {
+        if(json == null) {
+          console.log("입력데이터가 없습니다.");
+          getJsonData();
+          await sleep(1000);
+        }
+        let name = document.querySelector('#text-spec');
+        let rare = document.querySelector('#text-spec-rare');
+        //console.log("test", json);
+        
+        json.spec.name.push(name.value);
+        json.spec.rarity.push(rare.value);
+        firebaseSaveJson(json);
+
+        name.value='';
+        rare.value='';
+        
+        console.log("특성 추가 완료",json);
+      }
+      
+    </script>
+  </body>
+</html>

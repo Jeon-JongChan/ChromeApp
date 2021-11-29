@@ -25,13 +25,13 @@ async function interparkMacro(request) {
 
     }
     else if(request.status == 'Step2') {
-        statusLog(request.status," - 좌석 지정 선택");
+        statusLog(request.status," 좌석 지정 선택");
 
         let iframe = await asyncGetDom('#ifrmSeat');
         if(iframe) {
             interparkRecapRemove(request.status);
             let data = await interparkSeatList();
-            console.log(data);
+            //console.log(data);
             interparkSeatSummit(data);
             //let sheetList = iframe.contentDocument.querySelector('#ifrmSeatDetail').contentDocument.querySelectorAll('#TmgsTable img:not(#MainMap)');
             //let sheetNextBtn = iframe.contentDocument.querySelector('#NextStepImage');
@@ -69,7 +69,12 @@ async function interparkRecapRemove() {
     let ifrmSeat = await asyncGetDom("#ifrmSeat");
     if(ifrmSeat) {
         statusLog('Step2',"Recaptcha 제거를 시작합니다.");
-        ifrmSeat.contentDocument.querySelector("#divRecaptcha").remove();
+        let recaptcha = ifrmSeat.contentDocument.querySelector("#divRecaptcha");
+        if(!recaptcha) {
+            statusLog('Step2',"Recaptcha 제거에 실패했습니다.");
+            return;
+        } 
+        recaptcha.remove();
         ifrmSeat.contentDocument.querySelector("#divRecaptchaWrap").remove();
         ifrmSeat.contentDocument.querySelector("#rcckYN").value = "Y";
     }
@@ -86,14 +91,14 @@ async function interparkSeatList() {
         data : new Array(),
         detail : new Array()
     }
-
-    for(let idx=0; idx<10; idx++) {
+    let seatLoopNum = seatList.length;
+    for(let idx=0; idx<seatLoopNum; idx++) {
         let seat = seatList[idx];
         let outerHTML = seat.outerHTML.toString();
         let reg = regExp('(SelectSeat\\()[\\s\\S]+\\)',outerHTML);
         let seatData = parseSeat(reg);
         let seatDetail = [];
-        seatDetail.push(seatData[2].replace('층',''));
+        seatDetail.push(regExp('[0-9]',seatData[2]));
         seatDetail.push(seatData[3].replace('열','').split('구역'));
         seatBuffer.seat.push(seat);
         seatBuffer.data.push(seatData);
@@ -109,52 +114,84 @@ function parseSeat(rowdata) {
     rowdata = rowdata.split(',');
     return rowdata;
 }
-async function interparkSeatPriority(data) {
-    let seatLimit = 1;
-    let ret = new Array();
-
-    for(let i=0; i < data.length; i++) {
-        if(ret.length >= seatLimit) break;
-        let detail = data[i].detail;
-        if(detail[0] == 1) {
-            if(seatPriorityCheck(detail[1])) ret.push(data[i].data);
-        }
-        else if(detail[0] == 2) {
-            if(seatPriorityCheck(detail[1],1)) ret.push(data[i].data);
-        }
-    }
-    return ret;
-}
-function seatPriorityCheck(pos, checkCnt=6) {
-    let prioriy = [['B',3],['C',3],['A',3],['B',6],['C',6],['A',6]];
-
-    for(let i=0; i<checkCnt; i++) {
-        let startCol = prioriy[i][1]-2;
-        if(pos[0] === prioriy[i][0]) {
-            if(pos[1] >= startCol && pos[1] <= prioriy[i][1]) {
-                return true;
-            }
-        }
-    }
-    return false;
-}
 async function interparkSeatSummit(data) {
     let iframe = (await asyncGetDom('#ifrmSeat')).contentDocument;
     let ifrmSeatDetail = (await asyncGetDom('#ifrmSeatDetail','#ifrmSeat')).contentDocument;
 
     let selectSeats = await interparkSeatPriority(data);
-    console.log("PlaySeq data : ",document.querySelector('#PlaySeq').value);
+    //console.log("PlaySeq data : ",document.querySelector('#PlaySeq').value);
     if(selectSeats.length == 0) {
         alert("선택할 좌석이 존재하지 않습니다");
         return null;
     }
     if(iframe && ifrmSeatDetail) {
-        statusLog('Step2',"좌석 정보를 업그레이드 합니다.");
-        let playseq = iframe.querySelector('#PlaySeq');
-        let seatList = ifrmSeatDetail.querySelectorAll('#TmgsTable img:not(#MainMap)');
+        statusLog('Step2',"좌석 정보를 업그레이드 합니다.",selectSeats);
+        //let playseq = iframe.querySelector('#PlaySeq');
+        let formInfo = iframe.querySelector('#frmInfo');
+
+        var SeatGrade = "";
+        var Floor = "";
+        var RowNo = "";
+        var SeatNo = "";
+
+        for(i=0;i<selectSeats.length;i++){
+            o = selectSeats[i];
+            SeatGrade = SeatGrade + "" + o[1] + "^";
+            Floor = Floor + "" + o[2] + "^";
+            RowNo = RowNo + "" + o[3] + "^";
+            SeatNo = SeatNo + "" + o[4] + "^";
+        }
+        formInfo.Flag.value = "Blocking";
+        formInfo.PlaySeq.value = "002";
+        formInfo.SeatCnt.value = selectSeats.length;
+        formInfo.SeatGrade.value = SeatGrade;
+        formInfo.Floor.value = Floor;
+        formInfo.RowNo.value = RowNo;
+        formInfo.SeatNo.value = SeatNo;
+        //formInfo.
         //console.log(seatList[0]);
     }
 }
+async function interparkSeatPriority(data) {
+    console.log("Step2 : 좌석 우선순위에 따른 선택을 진행합니다.",data);
+    let seatLimit = 1, dataLen = data.detail.length;
+    let ret = new Array();
+    
+    for(let i=0; i < dataLen; i++) {
+        if(ret.length >= seatLimit) break;
+        let detail = data.detail[i];
+        if(detail[0] == '1') {
+            if(seatPriorityCheck(detail[1])) ret.push(data[i].data);
+        }
+        else if(detail[0] == '2') {
+            //console.log(data.length," ret :",ret.length," detail :",detail);
+            if(seatPriorityCheck(detail[1],1)) ret.push(data.data[i]);
+        }
+    }
+    console.log("Step2 : 좌석 우선순위에 따른 선택을 종료합니다.",ret);
+    return ret;
+}
+function seatPriorityCheck(pos, checkCnt=null) {
+    let fpriority = ['B','C','A','B','C','A']
+    let priority = [3,6];
+    let pCnt = checkCnt?checkCnt:2;
+    let fpCnt = checkCnt?checkCnt:6;
+    //console.log("Step2 : 좌석 우선순위 계산 pCnt : ",pCnt," , fpCnt : ",fpCnt, "좌석 : ", pos);
+    for(let i=0; i<pCnt; i++) {
+        let startCol = priority[i]-2;
+        if(pos.length > 1) {
+            for(let j=0; j<fpCnt; j++) {
+                if(pos[0] === fpriority[j] && (pos[1] >= startCol && pos[1] <= priority[i])) return true;
+            }
+        }
+        else if(pos.length === 1) {
+            if(pos[0] >= startCol && pos[0] <= priority[i]) return true;
+        }
+    }
+    
+    return false;
+}
+/*
 function fnSetPointDiscount(SeatBuffer){
     SelectAble = false;
         //선블럭킹 확인
@@ -180,7 +217,34 @@ function fnSetPointDiscount(SeatBuffer){
     $("frmInfo").SeatNo.value = SeatNo;
     $("frmInfo").submit();
 
+    Flag.value = "Blocking";
+    PlaySeq.value = $F("PlaySeq");
+    SeatCnt.value = SeatBuffer.index;
+    SeatGrade.value = SeatGrade;
+    Floor.value = Floor;
+    RowNo.value = RowNo;
+    SeatNo.value = SeatNo;
+    submit();
 }
+function seatTest(SeatBuffer){
+    SelectAble = false;
+        //선블럭킹 확인
+
+    var SeatGrade = "";
+    var Floor = "";
+    var RowNo = "";
+    var SeatNo = "";
+
+    for(i=0;i<SeatBuffer.index;i++){
+        o = SeatBuffer.pop(i);
+        SeatGrade = SeatGrade + "" + o.SeatGrade + "^";
+        Floor = Floor + "" + o.Floor + "^";
+        RowNo = RowNo + "" + o.RowNo + "^";
+        SeatNo = SeatNo + "" + o.SeatNo + "^";
+    }
+    console.log(SeatBuffer.index, SeatGrade, Floor, RowNo, SeatNo);
+}
+*/
 //콘텐츠에 해당 스크립트 동적삽입 -> 함수호출이 컨텐츠에서 가능해짐
 function make_script() {
     s = document.createElement('script');
