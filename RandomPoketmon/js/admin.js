@@ -37,6 +37,7 @@ function getJsonData() {
     dom.querySelector(".poket-img").style.backgroundImage= "url('"+await firebaseGetFileUrl(poketmon.image)+"')";
     dom.querySelector(".poket-name").innerText = poketmon.name;
     dom.querySelector(".poket-local").innerText = poketmon.local;
+    dom.querySelector(".poket-rare").innerText = poketmon.rare;
     dom.querySelector(".poket-type").innerText = poketmon.type;
     dom.querySelector(".poket-personal").innerText = poketmon.personal[0]+","+poketmon.personal[1];
     dom.querySelector(".poket-personal-hidden").innerText = poketmon.personal[2];
@@ -46,7 +47,7 @@ function getJsonData() {
     if(!template) template=document.querySelector("template").content;
     list = document.querySelector(".local-list");
     dom_template = template.querySelector(".local");
-    console.log("성격 리스트 초기화 시작", list, dom_template, json.local);
+    console.log("지역 리스트 초기화 시작");//, list, dom_template, json.local);
     
     for(var i=0; i<json.local.length; i++) {    
       list.appendChild(nodeLocal(json.local[i],dom_template));
@@ -67,7 +68,7 @@ function getJsonData() {
     if(!template) template=document.querySelector("template").content;
     list = document.querySelector(".spec-list");
     dom_template = template.querySelector(".spec");
-    console.log("성격 리스트 초기화 시작", list, dom_template, json.spec);
+    console.log("성격 리스트 초기화 시작");//, list, dom_template, json.spec);
     
     for(var i=0; i<json.spec.length; i++) {
       list.appendChild(nodeSpec(json.spec[i],dom_template));
@@ -91,6 +92,7 @@ function getJsonData() {
     let file = document.querySelector('#image-poketmon');
     let name = document.querySelector('.add-poketname .input-text');
     let local = document.querySelector('.add-local .input-text');
+    let rare = document.querySelector('.add-rare .input-text');
     let type = document.querySelector('.add-poket-type .input-text');
     let personal = document.querySelectorAll('.add-poketmon .add-personal input');
 
@@ -101,6 +103,7 @@ function getJsonData() {
       name : name.value,
       image : imgPath,
       local : local.value,
+      rare : rare.value,
       type : type.value,
       personal : [personal[0].value, personal[1].value, personal[2].value]
     }
@@ -111,6 +114,7 @@ function getJsonData() {
     name.value='';
     console.log("포켓몬 추가 완료",json);
     refreshAdmin("poketmon");
+    rewriteLocalCount(poketmon.local);
   }
 
   async function addLocal() {
@@ -148,19 +152,20 @@ function getJsonData() {
     refreshAdmin("spec");
   }
   
-  function deletePoketData(type) {
+function deletePoketData(type) {
     let target = event.target.parentNode;
     let idx = getDomIndex(target)-1;
     target.remove();
     
     if(type=="poketmon") {
-      json.poketmon.splice(idx,1);
+      let poketmon = json.poketmon.splice(idx,1);
+      if(poketmon.length > 0) rewriteLocalCount(poketmon[0].local);
     }
     else if(type=="spec") {
-      json.spec.splice(idx,1);
+        json.spec.splice(idx,1);
     }
     else if(type=="local") {
-      json.local.splice(idx,1);
+        json.local.splice(idx,1);
     }
     console.log("deletePoketData 완료 : ",json);
     firebaseSaveJson(json);
@@ -169,36 +174,45 @@ function getJsonData() {
   async function refreshAdmin(type) {
     getJsonData();
     await sleep(1000);
+    console.log("refreshAdmin - ",type," : 다시그리기 시작");
     if(type=="poketmon") {
-      let parentNode = document.querySelector(".poketmon-list");
-      let childLen = parentNode.childElementCount;
-      for(let i=childLen; i<json.poketmon.length; i++) {
-        let dom = await nodePoketmon(json.poketmon[i]);
-        parentNode.appendChild(dom);
-      }
+        let parentNode = document.querySelector(".poketmon-list");
+        let childLen = parentNode.childElementCount;
+        for(let i=childLen; i<json.poketmon.length; i++) {
+            let dom = await nodePoketmon(json.poketmon[i]);
+            parentNode.appendChild(dom);
+        }
     }
-    else if(type="spec") {
-      let parentNode = document.querySelector(".spec-list");
-      let childLen = parentNode.childElementCount;
-      for(let i=childLen; i<json.personal.length; i++) {
-        let dom = nodeSpec(json.personal[i]);
-        parentNode.appendChild(dom);
-      }
+    else if(type=="spec") {
+        let parentNode = document.querySelector(".spec-list");
+        let childLen = parentNode.childElementCount;
+        for(let i=childLen; i<json.spec.length; i++) {
+            let dom = nodeSpec(json.spec[i]);
+            parentNode.appendChild(dom);
+        }
     }
-    else if(type="local") {
-      let parentNode = document.querySelector(".local-list");
-      let childLen = parentNode.childElementCount;
-      for(let i=childLen; i<json.spec.length; i++) {
-        let dom = nodePersonal(json.spec[i]);
-        parentNode.appendChild(dom);
-      }
+    else if(type=="local") {
+        let parentNode = document.querySelector(".local-list");
+        let childLen = parentNode.childElementCount;
+        for(let i=childLen; i<json.local.length; i++) {
+            let dom = nodeLocal(json.local[i]);
+            parentNode.appendChild(dom);
+        }
     }
-  }
-  function localPoketCount(localName) {
+}
+function localPoketCount(localName) {
     let ret = 0;
     for(let i=0; i<json.poketmon.length; i++) {
-      let poketmon = json.poketmon[i];
-      if(poketmon.local===localName) ret += 1
+        let poketmon = json.poketmon[i];
+        if(poketmon.local===localName) ret += 1
     }
     return ret;
-  }
+}
+function rewriteLocalCount(localName) {
+    let idx = getNameIdx(json.local, localName);
+    console.log("rewriteLocalCount - ",localName," 카운트 수정중... idx : ", idx);
+    let localNode = document.querySelectorAll(".local-list .local")[idx];
+    let poketCount = localPoketCount(localName);
+    localNode.querySelector(".local-count").innerText = "( "+poketCount+" )";
+
+}

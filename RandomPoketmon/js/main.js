@@ -1,4 +1,5 @@
 function changeMenu(menu) {
+    getJsonData();
     let admin = document.querySelector("#admin");
     let main = document.querySelector("#main");
     let battle = document.querySelector("#battle");
@@ -54,7 +55,7 @@ function changeMenu(menu) {
     let player = document.querySelector("#player").value;
 
     let poketname = document.querySelector("#selected-poketmon").value;
-    let poket_idx = getPoketmonIdx(json.poketmon,poketname);
+    let poket_idx = getNameIdx(json.poketmon,poketname);
     if(poket_idx === -1) alert("포켓몬 이름이 이상합니다.");
 
 
@@ -74,29 +75,41 @@ function changeMenu(menu) {
     parent.querySelector("#poket-img").src=await firebaseGetFileUrl(json.poketmon[poket_idx].image);
 
   }
-  function getPoketmonIdx(objArr, name) {
-    for(let i=0; i<objArr.length; i++) {
-      if(objArr[i].name===name) {
-        return i;
-      }
-    }
-  }
+
   function randomPoketmon(local, exceptName=null)
   {
     let poketmons = []
+    let ret = null;
     for(let i=0; i<json.poketmon.length; i++) {
       let poketmon = json.poketmon[i];
-      if(poketmon.local === local) poketmons.push(poketmon); 
+      if(poketmon.local === local) {
+        if(exceptName && exceptName === poketmon.name) {
+            ret = poketmon;
+            continue;
+        }
+        poketmons.push(poketmon); 
+      }
     }
-    let ret = getRandomInt(0, poketmons.length);
-    let idx = 0;
-    while(exceptName !== null && exceptName === poketmons[ret].name) {
-      if(idx > 100) break;
-      idx++;
-      ret = getRandomInt(0, poketmons.length);
-      //console.log("randomPoketmon - name", poketmons[ret].name, " except :", exceptName, " status : ",exceptName === poketmons[ret].name)
-    }
-    return poketmons[ret];
+    if(poketmons.length === 0) return ret;
+    ret = getPoketmon(poketmons);
+    return ret;
+  }
+  function getPoketmon(poketmons) {
+      let ret = null;
+      let limit = 0;
+      while(!ret) {
+          limit++;
+          if(limit > 500) break;
+          for(let i=0; i<poketmons.length; i++) {
+              let target = poketmons[i];
+              let random = getRandomInt(0,100);
+              if(random < target.rare) {
+                  ret = poketmons[i];
+                  break;
+              }
+          }
+      }
+      return ret;
   }
   function randomPersonal(poketmon) {
     let randomIdx = getRandomInt(0,5);

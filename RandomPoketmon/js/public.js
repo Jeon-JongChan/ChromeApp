@@ -25,6 +25,14 @@ function getRandomValue(values) {
     let idx = getRandomInt(0, values.length);
     return values[idx];
 }
+function getNameIdx(objArr, name) 
+{
+    for(let i=0; i<objArr.length; i++) {
+      if(objArr[i].name===name) {
+        return i;
+      }
+    }
+}
 function copyToClipBoard(query) {
     var content = document.querySelector(query).innerText;
 

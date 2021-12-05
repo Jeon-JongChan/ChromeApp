@@ -61,6 +61,7 @@ article {
 }
 .add-header {
     margin: 0 10px 0 0;
+    font-weight: 700;
 }
 .poket-img {
     width: 150px;
@@ -112,7 +113,7 @@ article {
 }
 .spec {
     display: inline-block;
-    width: 150px;
+    width: 160px;
 }
 .spec button {
     float: right;
@@ -131,6 +132,7 @@ article {
     float: right;
     margin-right: 5px;
 }
+
 .help-text {
     font-size: 10px;
 }

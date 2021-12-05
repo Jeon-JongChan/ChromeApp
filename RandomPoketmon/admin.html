@@ -41,15 +41,15 @@
         <input id="bhealth1" type="number" value=100>
         <label for="bdamage1">데미지상성</label>
         <select name="damage" id="bdamage1">
-            <option value="1">x0.25</option>
-            <option value="2">x0.5</option>
-            <option value="3" selected>x1.0</option>
-            <option value="4">x2.0</option>
-            <option value="5">x4.0</option>
+            <option value="0">x0.25</option>
+            <option value="1">x0.5</option>
+            <option value="2" selected>x1.0</option>
+            <option value="3">x2.0</option>
+            <option value="4">x4.0</option>
         </select>
       </div>
       <div class="second-input">
-        <label for="bname2">선공포켓몬</label>
+        <label for="bname2">후공포켓몬</label>
         <input id="bname2" type="text" value="">
         <label for="bskill2">사용기술</label>
         <input id="bskill2" type="text" value="">
@@ -57,26 +57,27 @@
         <input id="bhealth2" type="number" value=100>
         <label for="bdamage2">데미지상성</label>
         <select name="damage" id="bdamage2">
-            <option value="1">x0.25</option>
-            <option value="2">x0.5</option>
-            <option value="3" selected>x1.0</option>
-            <option value="4">x2.0</option>
-            <option value="5">x4.0</option>
+            <option value="0">x0.25</option>
+            <option value="1">x0.5</option>
+            <option value="2" selected>x1.0</option>
+            <option value="3">x2.0</option>
+            <option value="4">x4.0</option>
         </select>
       </div>
       <div class="battle-dialoger half-div">
-        <button class="generator-btn" onclick="genBattleDialog()">포켓몬 랜덤 생성기</button>
+        <button class="generator-btn" onclick="genBattleDialog()">전투 데미지 로그 생성기</button>
         <button class="generator-btn" onclick="copyToClipBoard('.battle-dialog')">Copy</button>
         <div class="battle-dialog">
           <div style="font-size: 16px; text-align: center;">
-            <span class="bd-name1"></span>의&nbsp;<span class="bd-skill1"></span>!<br>
+            💥&nbsp;<span class="bd-name1"></span>의&nbsp;<span class="bd-skill1"></span>!<br>
             <span class="bd-effect1"></span>-(<span class="bd-damage1"></span>)%
             <br><br>
-            상대&nbsp;<span class="bd-name2"></span>의&nbsp;<span class="bd-skill2"></span>!<br>
+            💥&nbsp;상대&nbsp;<span class="bd-name2"></span>의&nbsp;<span class="bd-skill2"></span>!<br>
             <span class="bd-effect2"></span>-(<span class="bd-damage2"></span>)%
             <br><br>
             <span class="bd-name1"></span>&nbsp;: 남은체력&nbsp;<span class="bd-health1"></span>%<br>
             <span class="bd-name2"></span>&nbsp;: 남은체력&nbsp;<span class="bd-health2"></span>%<br>
+            ▶ 다음은 무엇을 할까?
           </div>
         </div>
       </div>
@@ -91,44 +92,51 @@
             "효과가 매우 굉장했다!"
           ]
           let input1 = {
-            name: battle.querySelector(".bname1").value(),
-            skill: battle.querySelector(".bskill1").value(),
-            health: battle.querySelector(".bhealth1").value(),
-            damage: battle.querySelector(".bdamage1").value(),
+            name: battle.querySelector("#bname1").value,
+            skill: battle.querySelector("#bskill1").value,
+            health: battle.querySelector("#bhealth1").value,
+            damage: battle.querySelector("#bdamage1").value,
           }
           let input2 = {
-            name: battle.querySelector(".bname1").value(),
-            skill: battle.querySelector(".bskill1").value(),
-            health: battle.querySelector(".bhealth1").value(),
-            damage: battle.querySelector(".bdamage1").value(),
+            name: battle.querySelector("#bname2").value,
+            skill: battle.querySelector("#bskill2").value,
+            health: battle.querySelector("#bhealth2").value,
+            damage: battle.querySelector("#bdamage2").value,
           }
-          if(!input1.name || !input2.name) alert("포켓몬 이름이 다 채워지지 않았습니다.");
-          if(!input1.skill || !input2.skill) alert("포켓몬 기술이 다 채워지지 않았습니다.");
+          if(!input1.name || !input2.name) {
+            alert("포켓몬 이름이 다 채워지지 않았습니다.");
+            return null;
+          }
+          if(!input1.skill || !input2.skill) {
+            alert("포켓몬 기술이 다 채워지지 않았습니다.");
+            return null;
+          }
 
           var names = battle.querySelectorAll('.bd-name1');
+          let damage1 = battleDamage(input1.damage);
+          let damage2 = battleDamage(input2.damage);
+
           names[0].innerText = input1.name;
           names[1].innerText = input1.name;
           battle.querySelector('.bd-skill1').innerText = input1.skill;
+          battle.querySelector('.bd-damage1').innerText = damage1;
           battle.querySelector('.bd-effect1').innerText = effectDialog[input1.damage*1];
-          let damage = battleDamage(input1.damage);
-          battle.querySelector('.bd-damage1').innerText = damage;
-          battle.querySelector('.bd-health1').innerText = input1.health-damage;
-
+          battle.querySelector('.bd-health1').innerText = input1.health-damage2;
+          
           names = battle.querySelectorAll('.bd-name2');
           names[0].innerText = input2.name;
           names[1].innerText = input2.name;
           battle.querySelector('.bd-skill2').innerText = input2.skill;
+          battle.querySelector('.bd-damage2').innerText = damage2;
           battle.querySelector('.bd-effect2').innerText = effectDialog[input2.damage*1];
-          damage = battleDamage(input2.damage);
-          battle.querySelector('.bd-damage2').innerText = damage;
-          battle.querySelector('.bd-health2').innerText = input2.health-damage;
+          battle.querySelector('.bd-health2').innerText = input2.health-damage1;
         }
         function battleDamage(option = 3) {
-          if(option==="1") return getRandomInt(0,10+1)
-          else if(option==="2") return getRandomInt(11,20+1)
-          else if(option==="3") return getRandomInt(21,40+1)
-          else if(option==="4") return getRandomInt(41,70+1)
-          else if(option==="5") return getRandomInt(71,90+1)
+          if(option==="0") return getRandomInt(0,10+1)
+          else if(option==="1") return getRandomInt(11,20+1)
+          else if(option==="2") return getRandomInt(21,40+1)
+          else if(option==="3") return getRandomInt(41,70+1)
+          else if(option==="4") return getRandomInt(71,90+1)
         }
       </script>
     </div>
@@ -190,19 +198,75 @@
         </div>
       </div>
     </div>
+    <style>
+      .search {
+        display: inline-block;
+        width: 120px;
+      }
+      .search-list {
+        width: 100%;
+        height: 50px;
+        overflow-x: scroll;
+        -ms-overflow-style: none;
+        -chrome-overflow-style: none;
+        border: 1px solid black;
+      }
+      .search-list::-webkit-scrollbar{
+         display:none; 
+      }
+      .local-search {
+        width: 100%;
+      }
+      .local-search .search-box {
+        float: right;
+      }
+    </style>
+    <script>
+      function searchLocalPoketmon(){
+        let searchLocal = document.querySelector("#input-search").value;
+        let paranetNode = document.querySelector(".search-list");
+        if(paranetNode.childElementCount > 0) {
+          let deleteNodes = paranetNode.childNodes;
+          while(deleteNodes.length > 1) {
+            deleteNodes[1].remove();
+          }
+        }
+
+        let template = document.querySelector("template").content.querySelector(".search");
+        let names = []
+        for(let i=0; i<json.poketmon.length; i++) {
+          let poketmon = json.poketmon[i];
+          if(searchLocal === poketmon.local) {
+            names.push(poketmon.name);
+          }
+        }
+        for(let i=0; i<names.length; i++) {
+          let dom = template.cloneNode(true);
+          dom.querySelector(".search-name").innerText = names[i];
+          paranetNode.appendChild(dom);
+        }
+
+      }
+      function nodeSearch(search, templateNode=null) {
+        if(!templateNode) {
+          templateNode = document.querySelector("template").content.querySelector(".search");
+        }
+        let dom = templateNode.cloneNode(true);
+        let name = spec.name;
+        dom.querySelector(".spec-name").innerText = name;
+        return dom;
+      }
+    </script>
     <div id="admin">
-      <div class="frame">
-        <article>
+      <div class="frame" style="min-height: 100px;">
+        <article style="width:100%;">
           <h1 class="list-header">포켓몬 지역별 등록 검색창</h1>
           <div class="local-search">
-            <input class="input-text" type="text"/>
-            <button class="search-btn">검색</button>
+            <input id="input-search" class="input-text" type="text"/>
+            <button class="search-btn" onclick="searchLocalPoketmon()">검색</button>
           </div>
-          <ul class="search-list">
-            <li class="search-item">피카츄</li>            
-            <li class="search-item">팬텀</li>            
-            <li class="search-item">잠만보</li>            
-          </ul>
+          <div class="search-list">    
+          </div>
         </article>
       </div>
       <div class="frame">
@@ -214,34 +278,38 @@
         <article class="article-center input-item">
           <section class="add-poketmon">
             <div class="additem add-poketname">
-              <h3 class="add-header">포켓몬 이름 :</h2>
-              <input class="input-text" type="text"/>
+              <label for="p-add-name" class="add-header">포켓몬 이름 :</label>
+              <input class="input-text" id="p-add-name" type="text"/>
             </div>
             <div class="additem add-poketimage">
-              <h3 class="add-header">이미지 :</h2>
+              <label class="add-header">이미지 :</label>
               <div class="input-file">
                 <input id="image-poketmon" type="file"/>
               </div>
             </div>
             <div class="additem add-local">
-              <h3 class="add-header">출몰지 :</h2>
-              <input class="input-text" type="text"/>
+              <label for="p-add-local" class="add-header">출몰지 :</label>
+              <input class="input-text" id="p-add-local" type="text"/>
+            </div>
+            <div class="additem add-rare">
+              <label class="add-header">출현율 :</label>
+              <input class="input-text" type="number"/>
             </div>
             <div class="additem add-poket-type">
-              <h3 class="add-header">포켓몬 타입 :</h2>
-              <input class="input-text" type="text"/>
+              <label for="p-add-type" class="add-header">포켓몬 타입 :</label>
+              <input class="input-text" id="p-add-type" type="text"/>
             </div>
             <div class="additem add-personal">
-              <h3 class="add-header">포켓몬 특성1 :</h2>
-              <input class="input-text" type="text"/>
+              <label for="p-add-personal" class="add-header">포켓몬 특성1 :</label>
+              <input class="input-text" id="p-add-personal" type="text"/>
             </div>
             <div class="additem add-personal">
-              <h3 class="add-header">포켓몬 특성2 :</h2>
-              <input class="input-text" type="text"/>
+              <label for="p-add-personal2" class="add-header">포켓몬 특성2 :</label>
+              <input class="input-text" id="p-add-personal2" type="text"/>
             </div>
             <div class="additem add-personal">
-              <h3 class="add-header">숨겨진 특성 :</h2>
-              <input class="input-text" type="text"/>
+              <label for="p-add-hidden" class="add-header">숨겨진 특성 :</label>
+              <input class="input-text" id="p-add-hidden" type="text"/>
             </div>
           </section>
           <div class="buttons">
@@ -258,7 +326,7 @@
         <article class="article-center input-item">
           <section class="add-poketmon">
             <div class="additem add-local-name">
-              <h3 class="add-header">포켓몬 출몰지 :</h2>
+              <label  class="add-header">포켓몬 출몰지 :</label>
               <input class="input-text" type="text"/>
             </div>
           </section>
@@ -276,7 +344,7 @@
         <article class="article-center input-item">
           <section class="add-poketmon">
             <div class="additem add-spec-name">
-              <h3 class="add-header">포켓몬 성격 :</h2>
+              <label class="add-header">포켓몬 성격 :</label>
               <input class="input-text" type="text"/>
             </div>
           </section>
@@ -308,11 +376,14 @@
             <div class="poket-line">
               <span class="left">지역 :</span>&nbsp;
               <span class="right poket-local"></span>
+            <div class="poket-line">
+              <span class="left">출현율 :</span>&nbsp;
+              <span class="right poket-rare"></span>%
             </div>
           </div>
         </div>
         <button style="width: 100%;" class="delete-btn" onclick="deletePoketData('poketmon')">X</button>
-      </section>
+      </section>input-search
       <section class="local">
         <span class="local-name"></span>&nbsp;<span class="local-count"></span>&nbsp;
         <button class="delete-btn" onclick="deletePoketData('local')">X</button>
@@ -321,6 +392,9 @@
         <!-- 성격 :&nbsp; -->
         <span class="spec-name"></span>&nbsp;&nbsp;
         <button class="delete-btn" onclick="deletePoketData('spec')">X</button>
+      </section>
+      <section class="search">
+        <span class="search-name"></span>&nbsp;
       </section>
     </template>
     <script>
