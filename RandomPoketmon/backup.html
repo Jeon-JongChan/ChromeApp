@@ -1,0 +1,33 @@
+<template>
+    <section class="poketmon">
+      <img class="poket-img" src="">
+      <h3></h3>
+    </section>
+    <section class="personal">
+        특성 :&nbsp;<span class="personal-name"></span>&nbsp;&nbsp;
+        <button class="delete-btn" onclick="deletePoketData('personal')">X</button>
+      </section>
+    <section class="spec">
+      성격 :&nbsp;<span class="spec-name"></span>&nbsp;-&nbsp;
+      희귀도 :&nbsp;<span class="spec-rare"></span>
+      <button class="delete-btn" onclick="deletePoketData()">X</button>
+    </section>
+</template>
+
+<div class="frame">
+    <article class="article-center">
+      <div class="personal-list">
+      </div>
+    </article>
+    <article class="article-center input-item">
+      <section class="add-poketmon">
+        <div class="additem add-personal-name">
+          <h2 class="add-header">포켓몬 특성 :</h2>
+          <input id="text-personal" type="text"/>
+        </div>
+      </section>
+      <div class="buttons">
+        <button id="add-personal-btn" onclick="addPersonal()">추가</button>
+      </div>
+    </article>
+  </div>

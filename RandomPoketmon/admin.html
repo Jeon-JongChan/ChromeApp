@@ -22,17 +22,42 @@
       #main {
         min-height: 800px;
       }
-      .generator {
+      .generator-btn {
         width: 100%;
       }
       .half-div {
         width: 49.5%;
         display:inline-block;
       }
+      .poket-dialog {
+        display: flex;
+      }
+      .music-icon {
+        width: 1rem;
+        height: 1rem;
+      }
+      .menu {
+        height: 40px;
+      }
+      .change-menu {
+        padding: 10px;
+        border: 0.5px solid;
+      }
     </style>
   </head>
   <body>
+    <nav class="menu">
+      <a class="change-menu" style="background-color: rgba(200,0,0,0.3);" onclick="changeMenu('admin')">ADMIN</a>
+      <a class="change-menu" style="background-color: rgba(0,200,0,0.3);" onclick="changeMenu('main')">MAIN</a>
+      <a class="change-menu" style="background-color: rgba(0,0,200,0.3);" onclick="changeMenu('battle')">BATTLE</a>
+    </nav>
     <div id="main">
+      <div class="player-local">
+        <label for="player">플레이어</label>
+        <input id="player" type="text" value="">
+        <label for="local">지역</label>
+        <input id="local" type="text" value="">
+      </div>
       <div class="selected">
         <label for="selected-poketmon">선택받은 포켓몬</label>
         <input id="selected-poketmon" type="text" value="">
@@ -47,62 +72,100 @@
         <label for="plevel-max">레벨 최대 범위</label>
         <input id="plevel-max" type="number" value="50">
       </div>
-
-      <div class="poketmon-selector half-div">
-        <button class="generator" onclick="genPoketSelector()">포켓몬 랜덤 생성기</button>
-        <div class="poketmon-select">
-          <p>
-            <span class="music"></span><br>
-            야생의 포켓몬이 나타났어. 로토...<br><br>
-            ...누구를 리서치 해볼까 로토?<br>
-            &#9654;<span class="poket1">돌살이</span><br>
-            &#9654;<span class="poket2">끼리동</span><br>
-          </p>
-          <img id="poket1-img" width="49%" src="">
-          <img id="poket2-img" width="49%" src="">
+      <div class="poket-dialog">
+        <div class="poketmon-selector half-div">
+          <button class="generator-btn" onclick="genPoketSelector()">포켓몬 랜덤 생성기</button>
+          <button class="generator-btn" onclick="copyToClipBoard('.poketmon-select')">Copy</button>
+          <div class="poketmon-select">
+            <p style="font-size: 16px;">
+              ♫<span class="music"></span><br>
+              야생의 포켓몬이 나타났어. <span class="player1"></span>...<br><br>
+              ...누구를 리서치 해볼까 <span class="player2"></span>?<br>
+              &#9654;<span class="poket1">돌살이</span><br>
+              &#9654;<span class="poket2">끼리동</span><br>
+            </p>
+            <img id="poket1-img" width="49%" src="">
+            <img id="poket2-img" width="49%" src="">
+          </div>
         </div>
-      </div>
-      <div class="poketmon-battler half-div">
-        <button class="generator" onclick="genPoketBattle()">포켓몬 전투 대사 생성기</button>
-        <div class="poketmon-battle">
-          <p>
-            <span class="music"></span><br><br>
-            야생의 <span class="pname"></span>이 나타났어.<br><br>
-            Lv.&nbsp;<span class="plevel"></span>&nbsp;[&nbsp;<span class="pspec"></span>&nbsp;]<br><br>
-            마키는 무엇을 할까?<br><br>
-            &#9654; 싸운다<br>
-            &#9654; 대화한다(프렌드볼 전용)<br>
-            &#9654; 몬스터볼<br>
-            &#9654; 도망친다<br>
-          </p>
-          <img id="poket-img" width="100%">
+        <div class="poketmon-battler half-div">
+          <button class="generator-btn" onclick="genPoketBattle()">포켓몬 전투 대사 생성기</button>
+          <button class="generator-btn" onclick="copyToClipBoard('.poketmon-battle')">Copy</button>
+          <div class="poketmon-battle">
+            <p style="font-size: 16px;">
+              ♫<span class="music"></span><br><br>
+              야생의 
+              <span class="pspec"></span>
+              <span class="pname"></span>가 나타났어.<br><br>
+              Lv.&nbsp;<span class="plevel"></span>&nbsp;[&nbsp;<span class="ppersonal"></span>&nbsp;]<br><br>
+              <span class="player1"></span>(은)는 무엇을 할까?<br><br>
+              &#9654; 싸운다<br>
+              &#9654; 대화한다(프렌드볼 전용)<br>
+              &#9654; 몬스터볼<br>
+              &#9654; 도망친다<br>
+            </p>
+            <img id="poket-img" width="100%">
+          </div>
         </div>
       </div>
       <script>
-        console.log("main :",json);
+        function changeMenu(menu) {
+          let admin = document.querySelector("#admin");
+          let main = document.querySelector("#main");
+          let battle = document.querySelector("#battle");
+          if(menu==="admin"){
+            if(admin) admin.style.display="block";
+            if(main) main.style.display="none";
+            if(battle) battle.style.display="none";
+          }
+          else if(menu==="main"){
+            if(admin) admin.style.display="none";
+            if(main) main.style.display="block";
+            if(battle) battle.style.display="none";
+          }
+          else if(menu==="battle"){
+            if(admin) admin.style.display="none";
+            if(main) main.style.display="none";
+            if(battle) battle.style.display="block";
+          }
+          console.log("메뉴변경 완료 : ",menu);
+        }
         async function genPoketSelector() {
-          console.log("포켓몬 랜덤 생성 작동");
-          let selector = document.querySelector(".poketmon-select");
+          let parent = document.querySelector(".poketmon-select");
           let youtube_url = document.querySelector("#youtube-url").value;
+          let player = document.querySelector("#player").value;
+          let local = document.querySelector("#local").value;
 
+          if(!player) {
+            alert("플레이어 이름이 존재하지않습니다.");
+          }
+          else if(!local) {
+            alert("지역이 존재하지않습니다.");
+          }
+          
           // let plevel = document.querySelector(".plevel");
           // let minlevel = plevel.querySelector("plevel-min").value;
           // let maxlevel = plevel.querySelector("plevel-max").value;
-          let poket1 = randomPoketmon();
-          let poket2 = randomPoketmon(poket1);
+          let poket1 = randomPoketmon(local);
+          console.log("포켓몬 랜덤 생성 작동");
+          let poket2 = randomPoketmon(local,poket1.name);
 
-          selector.querySelector(".music").innerText=youtube_url;
-          selector.querySelector(".poket1").innerText=json.poketmon.name[poket1];
-          selector.querySelector("#poket1-img").src=await firebaseGetFileUrl(json.poketmon.image[poket1]);
-          selector.querySelector(".poket2").innerText=json.poketmon.name[poket2];
-          selector.querySelector("#poket2-img").src=await firebaseGetFileUrl(json.poketmon.image[poket2]);
+          parent.querySelector(".music").innerText=youtube_url;
+          parent.querySelector(".player1").innerText=player;
+          parent.querySelector(".player2").innerText=player;
+          parent.querySelector(".poket1").innerText=poket1.name;
+          parent.querySelector("#poket1-img").src=await firebaseGetFileUrl(poket1.image);
+          parent.querySelector(".poket2").innerText=poket2.name;
+          parent.querySelector("#poket2-img").src=await firebaseGetFileUrl(poket2.image);
         }
         async function genPoketBattle() {
           console.log("포켓몬 전투 작동");
           let parent = document.querySelector(".poketmon-battle");
           let youtube_url = document.querySelector("#youtube-url").value;
+          let player = document.querySelector("#player").value;
+
           let poketname = document.querySelector("#selected-poketmon").value;
-          let poket_idx = json.poketmon.name.indexOf(poketname);
+          let poket_idx = getPoketmonIdx(json.poketmon,poketname);
           if(poket_idx === -1) alert("포켓몬 이름이 이상합니다.");
 
 
@@ -110,28 +173,57 @@
           let minlevel = plevel.querySelector("#plevel-min").value;
           let maxlevel = plevel.querySelector("#plevel-max").value;
           let level = getRandomInt(minlevel, maxlevel);
-          let spec = getRandomValue(json.spec.name);
+          let spec = getRandomValue(json.spec);
 
           parent.querySelector(".music").innerText=youtube_url;
+          parent.querySelector(".pspec").innerText=spec.name;
+          parent.querySelector(".player1").innerText=player;
           parent.querySelector(".pname").innerText=poketname;
           parent.querySelector(".plevel").innerText=level;
-          parent.querySelector(".pspec").innerText=spec;
-          parent.querySelector("#poket-img").src=await firebaseGetFileUrl(json.poketmon.image[poket_idx]);
+          parent.querySelector(".ppersonal").innerText=randomPersonal(json.poketmon[poket_idx]);
+          //console.log(" test : ",poket_idx,json.poketmon[poket_idx]);
+          parent.querySelector("#poket-img").src=await firebaseGetFileUrl(json.poketmon[poket_idx].image);
 
         }
-        function randomPoketmon(except=null)
-        {
-          let ret = getRandomInt(0, json.poketmon.name.length);
-          while(except !== null && except === ret) {
-            ret = getRandomInt(0, json.poketmon.name.length);
+        function getPoketmonIdx(objArr, name) {
+          for(let i=0; i<objArr.length; i++) {
+            if(objArr[i].name===name) {
+              return i;
+            }
           }
-          return ret;
+        }
+        function randomPoketmon(local, exceptName=null)
+        {
+          let poketmons = []
+          for(let i=0; i<json.poketmon.length; i++) {
+            let poketmon = json.poketmon[i];
+            if(poketmon.local === local) poketmons.push(poketmon); 
+          }
+          let ret = getRandomInt(0, poketmons.length);
+          let idx = 0;
+          while(exceptName !== null && exceptName === poketmons[ret].name) {
+            if(idx > 100) break;
+            idx++;
+            ret = getRandomInt(0, poketmons.length);
+            //console.log("randomPoketmon - name", poketmons[ret].name, " except :", exceptName, " status : ",exceptName === poketmons[ret].name)
+          }
+          return poketmons[ret];
+        }
+        function randomPersonal(poketmon) {
+          let randomIdx = getRandomInt(0,5);
+          console.log("randomPersonal : ",poketmon,randomIdx);
+          if(randomIdx === 0 || randomIdx === 1) return poketmon.personal[0]
+          else if(randomIdx === 2 || randomIdx === 3) return poketmon.personal[1]
+          else if(randomIdx === 4) return poketmon.personal[2]
         }
       </script>
     </div>
+    <style>
+
+    </style>
     <div id="admin">
       <div class="frame">
-        <article>
+        <article class="article-left">
             <h1 class="list-header">포켓몬 리스트</h1>
             <div class="poketmon-list">
             </div>
@@ -139,14 +231,34 @@
         <article class="article-center input-item">
           <section class="add-poketmon">
             <div class="additem add-poketname">
-              <h2 class="add-header">포켓몬 이름 :</h2>
-              <input id="text-poketmon" type="text"/>
+              <h3 class="add-header">포켓몬 이름 :</h2>
+              <input class="input-text" type="text"/>
             </div>
             <div class="additem add-poketimage">
-              <h2 class="add-header">포켓몬 이미지 :</h2>
+              <h3 class="add-header">이미지 :</h2>
               <div class="input-file">
                 <input id="image-poketmon" type="file"/>
               </div>
+            </div>
+            <div class="additem add-local">
+              <h3 class="add-header">출몰지 :</h2>
+              <input class="input-text" type="text"/>
+            </div>
+            <div class="additem add-poket-type">
+              <h3 class="add-header">포켓몬 타입 :</h2>
+              <input class="input-text" type="text"/>
+            </div>
+            <div class="additem add-personal">
+              <h3 class="add-header">포켓몬 특성1 :</h2>
+              <input class="input-text" type="text"/>
+            </div>
+            <div class="additem add-personal">
+              <h3 class="add-header">포켓몬 특성2 :</h2>
+              <input class="input-text" type="text"/>
+            </div>
+            <div class="additem add-personal">
+              <h3 class="add-header">숨겨진 특성 :</h2>
+              <input class="input-text" type="text"/>
             </div>
           </section>
           <div class="buttons">
@@ -155,40 +267,34 @@
         </article>
       </div>
       <div class="frame">
-        <article class="article-center">
-          <div class="personal-list">
+        <article class="article-left">
+          <h1 class="list-header">출몰 지역 참조 리스트</h1>
+          <div class="local-list">
           </div>
         </article>
         <article class="article-center input-item">
           <section class="add-poketmon">
-            <div class="additem add-personal-name">
-              <h2 class="add-header">포켓몬 특성 :</h2>
-              <input id="text-personal" type="text"/>
-            </div>
-            <div class="additem add-personal-rare">
-              <h2 class="add-header">포켓 희귀도 :</h2>
-              <input id="text-personal-rare" type="number"/>
+            <div class="additem add-local-name">
+              <h3 class="add-header">포켓몬 출몰지 :</h2>
+              <input class="input-text" type="text"/>
             </div>
           </section>
           <div class="buttons">
-            <button id="add-personal-btn" onclick="addPersonal()">추가</button>
+            <button id="add-spec-btn" onclick="addLocal()">추가</button>
           </div>
         </article>
       </div>
       <div class="frame">
-        <article class="article-center">
+        <article class="article-left">
+          <h1 class="list-header">포켓몬 성격 리스트</h1>
           <div class="spec-list">
           </div>
         </article>
         <article class="article-center input-item">
           <section class="add-poketmon">
             <div class="additem add-spec-name">
-              <h2 class="add-header">포켓몬 성격 :</h2>
-              <input id="text-spec" type="text"/>
-            </div>
-            <div class="additem add-spec-rare">
-              <h2 class="add-header">성격 희귀도 :</h2>
-              <input id="text-spec-rare" type="number"/>
+              <h3 class="add-header">포켓몬 성격 :</h2>
+              <input class="input-text" type="text"/>
             </div>
           </section>
           <div class="buttons">
@@ -197,19 +303,41 @@
         </article>
       </div>
     </div>
-    
     <template>
       <section class="poketmon">
-        <img class="poket-img" src="">
-        <h3></h3>
+        <div class="poket-img">
+          <div class="poket-modal">
+            <div class="poket-line">
+              <h3 class="poket-name"></h3>
+            </div>
+            <div class="poket-line">
+              <span class="left">타입 :</span>&nbsp;
+              <span class="right poket-type"></span>
+            </div>
+            <div class="poket-line">
+              <span class="left">특성 :</span>&nbsp;
+              <span class="right poket-personal"></span>
+            </div>
+            <div class="poket-line">
+              <span class="left">히든특성</span>&nbsp;
+              <span class="right poket-personal-hidden"></span>
+            </div>
+            <div class="poket-line">
+              <span class="left">지역 :</span>&nbsp;
+              <span class="right poket-local"></span>
+            </div>
+          </div>
+        </div>
+        <button style="width: 100%;" class="delete-btn" onclick="deletePoketData('poketmon')">X</button>
       </section>
-      <section class="personal">
-        특성 :&nbsp;<span class="person-name"></span>&nbsp;-&nbsp;
-        희귀도 :&nbsp;<span class="person-rare"></span>
+      <section class="local">
+        <span class="local-name"></span>&nbsp;&nbsp;
+        <button class="delete-btn" onclick="deletePoketData('local')">X</button>
       </section>
       <section class="spec">
-        성격 :&nbsp;<span class="spec-name"></span>&nbsp;-&nbsp;
-        희귀도 :&nbsp;<span class="spec-rare"></span>
+        <!-- 성격 :&nbsp; -->
+        <span class="spec-name"></span>&nbsp;&nbsp;
+        <button class="delete-btn" onclick="deletePoketData('spec')">X</button>
       </section>
     </template>
     <script>
@@ -227,54 +355,73 @@
       
       async function initAdminPage() {
         getJsonData();
-        await sleep(1000);
+        await sleep(2000);
         let template = document.querySelector("template").content;
-        
+        initPoketAdmin(template);
+        initLocalAdmin(template);
+        initSpecAdmin(template);
+      }
+
+      async function initPoketAdmin(template=null) {
+        if(!template) template=document.querySelector("template").content;
         /*포켓몬 리스트 초기화*/
         let list = document.querySelector(".poketmon-list");
         let dom_template = template.querySelector(".poketmon");
         console.log("포켓몬 리스트 초기화 시작", json);
-        for(var i=0; i<json.poketmon.name.length; i++) {
-          var dom = dom_template.cloneNode(true);
-          var name = json.poketmon.name[i];
-          var image = json.poketmon.image[i];
-
-          dom.querySelector("img").src = await firebaseGetFileUrl(image);
-          dom.querySelector("h3").innerText = name;
-          
-          list.appendChild(dom);
+        for(var i=0; i<json.poketmon.length; i++) {
+          list.appendChild(await nodePoketmon(json.poketmon[i], dom_template));
         }
-        /*특성 리스트 초기화*/
-        list = document.querySelector(".personal-list");
-        dom_template = template.querySelector(".personal");
-        console.log("특성 리스트 초기화 시작", list, dom_template, json.personality);
+      }
+      async function nodePoketmon(poketmon, templateNode=null) {
+        if(!templateNode) {
+          templateNode = document.querySelector("template").content.querySelector(".poketmon");
+        }
+        let dom = templateNode.cloneNode(true);
+        dom.querySelector(".poket-img").style.backgroundImage= "url('"+await firebaseGetFileUrl(poketmon.image)+"')";
+        dom.querySelector(".poket-name").innerText = poketmon.name;
+        dom.querySelector(".poket-local").innerText = poketmon.local;
+        dom.querySelector(".poket-type").innerText = poketmon.type;
+        dom.querySelector(".poket-personal").innerText = poketmon.personal[0]+","+poketmon.personal[1];
+        dom.querySelector(".poket-personal-hidden").innerText = poketmon.personal[2];
+        return dom;
+      }
+      function initLocalAdmin(template=null) {
+        if(!template) template=document.querySelector("template").content;
+        list = document.querySelector(".local-list");
+        dom_template = template.querySelector(".local");
+        console.log("성격 리스트 초기화 시작", list, dom_template, json.local);
         
-        for(var i=0; i<json.personality.name.length; i++) {
-          var dom = dom_template.cloneNode(true);
-          var name = json.personality.name[i];
-          var rare = json.personality.rarity[i];
-
-          dom.querySelector(".person-name").innerText = name;
-          dom.querySelector(".person-rare").innerText = rare;
-          
-          list.appendChild(dom);
+        for(var i=0; i<json.local.length; i++) {    
+          list.appendChild(nodeLocal(json.local[i],dom_template));
         }
-        /*성격 리스트 초기화*/
+      }
+      function nodeLocal(local, templateNode=null) {
+        if(!templateNode) {
+          templateNode = document.querySelector("template").content.querySelector(".local");
+        }
+        let dom = templateNode.cloneNode(true);
+        let name = local.name;
+        dom.querySelector(".local-name").innerText = name;
+        return dom;
+      }
+      function initSpecAdmin(template=null) {
+        if(!template) template=document.querySelector("template").content;
         list = document.querySelector(".spec-list");
         dom_template = template.querySelector(".spec");
         console.log("성격 리스트 초기화 시작", list, dom_template, json.spec);
         
-        for(var i=0; i<json.spec.name.length; i++) {
-          var dom = dom_template.cloneNode(true);
-          var name = json.spec.name[i];
-          var rare = json.spec.rarity[i];
-
-          dom.querySelector(".spec-name").innerText = name;
-          dom.querySelector(".spec-rare").innerText = rare;
-          
-          list.appendChild(dom);
+        for(var i=0; i<json.spec.length; i++) {
+          list.appendChild(nodeSpec(json.spec[i],dom_template));
         }
-        console.log();
+      }
+      function nodeSpec(spec, templateNode=null) {
+        if(!templateNode) {
+          templateNode = document.querySelector("template").content.querySelector(".spec");
+        }
+        let dom = templateNode.cloneNode(true);
+        let name = spec.name;
+        dom.querySelector(".spec-name").innerText = name;
+        return dom;
       }
 
       initAdminPage();
@@ -284,39 +431,47 @@
           getJsonData();
           await sleep(1000);
         }
-        let name = document.querySelector('#text-poketmon');
         let file = document.querySelector('#image-poketmon');
+        let name = document.querySelector('.add-poketname .input-text');
+        let local = document.querySelector('.add-local .input-text');
+        let type = document.querySelector('.add-poket-type .input-text');
+        let personal = document.querySelectorAll('.add-poketmon .add-personal input');
+
         let imgPath = 'image/'+name.value;
         firebaseSaveFile(imgPath, file.files[0]);
+
+        let poketmon = {
+          name : name.value,
+          image : imgPath,
+          local : local.value,
+          type : type.value,
+          personal : [personal[0].value, personal[1].value, personal[2].value]
+        }
         
-        json.poketmon.name.push(name.value);
-        json.poketmon.image.push(imgPath);
+        json.poketmon.push(poketmon);
         firebaseSaveJson(json);
 
         name.value='';
-        //file.value='';
-        
         console.log("포켓몬 추가 완료",json);
+        refreshAdmin("poketmon");
       }
 
-      async function addPersonal() {
+      async function addLocal() {
         if(json == null) {
           console.log("입력데이터가 없습니다.");
           getJsonData();
           await sleep(1000);
         }
-        let name = document.querySelector('#text-personal');
-        let rare = document.querySelector('#text-personal-rare');
-        //console.log("test", json);
-        
-        json.personality.name.push(name.value);
-        json.personality.rarity.push(rare.value);
+        let name = document.querySelector('add-local-name .input-text');
+        let local = {
+          name : name.value
+        }
+        json.local.push(local);
         firebaseSaveJson(json);
 
         name.value='';
-        rare.value='';
-        
         console.log("특성 추가 완료",json);
+        refreshAdmin("personal");
       }
       async function addSpec() {
         if(json == null) {
@@ -324,20 +479,65 @@
           getJsonData();
           await sleep(1000);
         }
-        let name = document.querySelector('#text-spec');
-        let rare = document.querySelector('#text-spec-rare');
-        //console.log("test", json);
-        
-        json.spec.name.push(name.value);
-        json.spec.rarity.push(rare.value);
+        let name = document.querySelector('.add-spec-name .input-text');
+        let spec = {
+          name : name.value
+        }
+        json.spec.push(spec);
         firebaseSaveJson(json);
 
         name.value='';
-        rare.value='';
-        
         console.log("특성 추가 완료",json);
+        refreshAdmin("spec");
       }
       
+      function deletePoketData(type) {
+        let target = event.target.parentNode;
+        let idx = getDomIndex(target)-1;
+        target.remove();
+        
+        if(type=="poketmon") {
+          json.poketmon.splice(idx,1);
+        }
+        else if(type=="spec") {
+          json.spec.splice(idx,1);
+        }
+        else if(type=="local") {
+          json.local.splice(idx,1);
+        }
+        console.log("deletePoketData 완료 : ",json);
+        firebaseSaveJson(json);
+      }
+
+      async function refreshAdmin(type) {
+        getJsonData();
+        await sleep(1000);
+        if(type=="poketmon") {
+          let parentNode = document.querySelector(".poketmon-list");
+          let childLen = parentNode.childElementCount;
+          for(let i=childLen; i<json.poketmon.length; i++) {
+            let dom = await nodePoketmon(json.poketmon[i]);
+            parentNode.appendChild(dom);
+          }
+        }
+        else if(type="spec") {
+          let parentNode = document.querySelector(".spec-list");
+          let childLen = parentNode.childElementCount;
+          for(let i=childLen; i<json.personal.length; i++) {
+            let dom = nodeSpec(json.personal[i]);
+            parentNode.appendChild(dom);
+          }
+        }
+        else if(type="local") {
+          let parentNode = document.querySelector(".local-list");
+          let childLen = parentNode.childElementCount;
+          for(let i=childLen; i<json.spec.length; i++) {
+            let dom = nodePersonal(json.spec[i]);
+            parentNode.appendChild(dom);
+          }
+        }
+      }
+      changeMenu('main');
     </script>
   </body>
 </html>
