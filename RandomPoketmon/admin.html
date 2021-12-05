@@ -4,9 +4,14 @@
     <meta charset="utf-8">
     <title>포켓몬 랜덤 페이지</title>
     <link rel="stylesheet" type="text/css" href="css/admin.css">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <!-- <link rel="stylesheet" type="text/css" href="css/admin.css"> -->
+    <script src="config.js" type="text/javascript"></script>
     <script src="data.js" type="text/javascript"></script>
-    <script src="js/public.js" type="text/javascript"></script>
     <script src="js/firebase.js" type="text/javascript"></script>
+    <script src="js/public.js" type="text/javascript"></script>
+    <script src="js/admin.js" type="text/javascript"></script>
+    <script src="js/main.js" type="text/javascript"></script>
     <script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-analytics.js"></script>
@@ -18,39 +23,115 @@
       const database = firebase.database();
       const storage = firebase.storage();
     </script>
-    <style>
-      #main {
-        min-height: 800px;
-      }
-      .generator-btn {
-        width: 100%;
-      }
-      .half-div {
-        width: 49.5%;
-        display:inline-block;
-      }
-      .poket-dialog {
-        display: flex;
-      }
-      .music-icon {
-        width: 1rem;
-        height: 1rem;
-      }
-      .menu {
-        height: 40px;
-      }
-      .change-menu {
-        padding: 10px;
-        border: 0.5px solid;
-      }
-    </style>
   </head>
   <body>
+    <img class="logo" src="logo.png" width="200px" style="margin-bottom: 10px;">
     <nav class="menu">
       <a class="change-menu" style="background-color: rgba(200,0,0,0.3);" onclick="changeMenu('admin')">ADMIN</a>
       <a class="change-menu" style="background-color: rgba(0,200,0,0.3);" onclick="changeMenu('main')">MAIN</a>
       <a class="change-menu" style="background-color: rgba(0,0,200,0.3);" onclick="changeMenu('battle')">BATTLE</a>
     </nav>
+    <div id="battle">
+      <div class="first-input">
+        <label for="bname1">선공포켓몬</label>
+        <input id="bname1" type="text" value="">
+        <label for="bskill1">사용기술</label>
+        <input id="bskill1" type="text" value="">
+        <label for="bhealth1">현재체력</label>
+        <input id="bhealth1" type="number" value=100>
+        <label for="bdamage1">데미지상성</label>
+        <select name="damage" id="bdamage1">
+            <option value="1">x0.25</option>
+            <option value="2">x0.5</option>
+            <option value="3" selected>x1.0</option>
+            <option value="4">x2.0</option>
+            <option value="5">x4.0</option>
+        </select>
+      </div>
+      <div class="second-input">
+        <label for="bname2">선공포켓몬</label>
+        <input id="bname2" type="text" value="">
+        <label for="bskill2">사용기술</label>
+        <input id="bskill2" type="text" value="">
+        <label for="bhealth2">현재체력</label>
+        <input id="bhealth2" type="number" value=100>
+        <label for="bdamage2">데미지상성</label>
+        <select name="damage" id="bdamage2">
+            <option value="1">x0.25</option>
+            <option value="2">x0.5</option>
+            <option value="3" selected>x1.0</option>
+            <option value="4">x2.0</option>
+            <option value="5">x4.0</option>
+        </select>
+      </div>
+      <div class="battle-dialoger half-div">
+        <button class="generator-btn" onclick="genBattleDialog()">포켓몬 랜덤 생성기</button>
+        <button class="generator-btn" onclick="copyToClipBoard('.battle-dialog')">Copy</button>
+        <div class="battle-dialog">
+          <div style="font-size: 16px; text-align: center;">
+            <span class="bd-name1"></span>의&nbsp;<span class="bd-skill1"></span>!<br>
+            <span class="bd-effect1"></span>-(<span class="bd-damage1"></span>)%
+            <br><br>
+            상대&nbsp;<span class="bd-name2"></span>의&nbsp;<span class="bd-skill2"></span>!<br>
+            <span class="bd-effect2"></span>-(<span class="bd-damage2"></span>)%
+            <br><br>
+            <span class="bd-name1"></span>&nbsp;: 남은체력&nbsp;<span class="bd-health1"></span>%<br>
+            <span class="bd-name2"></span>&nbsp;: 남은체력&nbsp;<span class="bd-health2"></span>%<br>
+          </div>
+        </div>
+      </div>
+      <script>
+        function genBattleDialog() {
+          let battle = document.querySelector('#battle');
+          let effectDialog = [
+            "효과가 매우 부족한 것 같다...",
+            "효과가 부족한 것 같다...",
+            '',
+            "효과가 굉장했다!",
+            "효과가 매우 굉장했다!"
+          ]
+          let input1 = {
+            name: battle.querySelector(".bname1").value(),
+            skill: battle.querySelector(".bskill1").value(),
+            health: battle.querySelector(".bhealth1").value(),
+            damage: battle.querySelector(".bdamage1").value(),
+          }
+          let input2 = {
+            name: battle.querySelector(".bname1").value(),
+            skill: battle.querySelector(".bskill1").value(),
+            health: battle.querySelector(".bhealth1").value(),
+            damage: battle.querySelector(".bdamage1").value(),
+          }
+          if(!input1.name || !input2.name) alert("포켓몬 이름이 다 채워지지 않았습니다.");
+          if(!input1.skill || !input2.skill) alert("포켓몬 기술이 다 채워지지 않았습니다.");
+
+          var names = battle.querySelectorAll('.bd-name1');
+          names[0].innerText = input1.name;
+          names[1].innerText = input1.name;
+          battle.querySelector('.bd-skill1').innerText = input1.skill;
+          battle.querySelector('.bd-effect1').innerText = effectDialog[input1.damage*1];
+          let damage = battleDamage(input1.damage);
+          battle.querySelector('.bd-damage1').innerText = damage;
+          battle.querySelector('.bd-health1').innerText = input1.health-damage;
+
+          names = battle.querySelectorAll('.bd-name2');
+          names[0].innerText = input2.name;
+          names[1].innerText = input2.name;
+          battle.querySelector('.bd-skill2').innerText = input2.skill;
+          battle.querySelector('.bd-effect2').innerText = effectDialog[input2.damage*1];
+          damage = battleDamage(input2.damage);
+          battle.querySelector('.bd-damage2').innerText = damage;
+          battle.querySelector('.bd-health2').innerText = input2.health-damage;
+        }
+        function battleDamage(option = 3) {
+          if(option==="1") return getRandomInt(0,10+1)
+          else if(option==="2") return getRandomInt(11,20+1)
+          else if(option==="3") return getRandomInt(21,40+1)
+          else if(option==="4") return getRandomInt(41,70+1)
+          else if(option==="5") return getRandomInt(71,90+1)
+        }
+      </script>
+    </div>
     <div id="main">
       <div class="player-local">
         <label for="player">플레이어</label>
@@ -98,7 +179,7 @@
               <span class="pspec"></span>
               <span class="pname"></span>가 나타났어.<br><br>
               Lv.&nbsp;<span class="plevel"></span>&nbsp;[&nbsp;<span class="ppersonal"></span>&nbsp;]<br><br>
-              <span class="player1"></span>(은)는 무엇을 할까?<br><br>
+              <span class="player1"></span>는 무엇을 할까?<br><br>
               &#9654; 싸운다<br>
               &#9654; 대화한다(프렌드볼 전용)<br>
               &#9654; 몬스터볼<br>
@@ -108,120 +189,22 @@
           </div>
         </div>
       </div>
-      <script>
-        function changeMenu(menu) {
-          let admin = document.querySelector("#admin");
-          let main = document.querySelector("#main");
-          let battle = document.querySelector("#battle");
-          if(menu==="admin"){
-            if(admin) admin.style.display="block";
-            if(main) main.style.display="none";
-            if(battle) battle.style.display="none";
-          }
-          else if(menu==="main"){
-            if(admin) admin.style.display="none";
-            if(main) main.style.display="block";
-            if(battle) battle.style.display="none";
-          }
-          else if(menu==="battle"){
-            if(admin) admin.style.display="none";
-            if(main) main.style.display="none";
-            if(battle) battle.style.display="block";
-          }
-          console.log("메뉴변경 완료 : ",menu);
-        }
-        async function genPoketSelector() {
-          let parent = document.querySelector(".poketmon-select");
-          let youtube_url = document.querySelector("#youtube-url").value;
-          let player = document.querySelector("#player").value;
-          let local = document.querySelector("#local").value;
-
-          if(!player) {
-            alert("플레이어 이름이 존재하지않습니다.");
-          }
-          else if(!local) {
-            alert("지역이 존재하지않습니다.");
-          }
-          
-          // let plevel = document.querySelector(".plevel");
-          // let minlevel = plevel.querySelector("plevel-min").value;
-          // let maxlevel = plevel.querySelector("plevel-max").value;
-          let poket1 = randomPoketmon(local);
-          console.log("포켓몬 랜덤 생성 작동");
-          let poket2 = randomPoketmon(local,poket1.name);
-
-          parent.querySelector(".music").innerText=youtube_url;
-          parent.querySelector(".player1").innerText=player;
-          parent.querySelector(".player2").innerText=player;
-          parent.querySelector(".poket1").innerText=poket1.name;
-          parent.querySelector("#poket1-img").src=await firebaseGetFileUrl(poket1.image);
-          parent.querySelector(".poket2").innerText=poket2.name;
-          parent.querySelector("#poket2-img").src=await firebaseGetFileUrl(poket2.image);
-        }
-        async function genPoketBattle() {
-          console.log("포켓몬 전투 작동");
-          let parent = document.querySelector(".poketmon-battle");
-          let youtube_url = document.querySelector("#youtube-url").value;
-          let player = document.querySelector("#player").value;
-
-          let poketname = document.querySelector("#selected-poketmon").value;
-          let poket_idx = getPoketmonIdx(json.poketmon,poketname);
-          if(poket_idx === -1) alert("포켓몬 이름이 이상합니다.");
-
-
-          let plevel = document.querySelector(".plevel");
-          let minlevel = plevel.querySelector("#plevel-min").value;
-          let maxlevel = plevel.querySelector("#plevel-max").value;
-          let level = getRandomInt(minlevel, maxlevel);
-          let spec = getRandomValue(json.spec);
-
-          parent.querySelector(".music").innerText=youtube_url;
-          parent.querySelector(".pspec").innerText=spec.name;
-          parent.querySelector(".player1").innerText=player;
-          parent.querySelector(".pname").innerText=poketname;
-          parent.querySelector(".plevel").innerText=level;
-          parent.querySelector(".ppersonal").innerText=randomPersonal(json.poketmon[poket_idx]);
-          //console.log(" test : ",poket_idx,json.poketmon[poket_idx]);
-          parent.querySelector("#poket-img").src=await firebaseGetFileUrl(json.poketmon[poket_idx].image);
-
-        }
-        function getPoketmonIdx(objArr, name) {
-          for(let i=0; i<objArr.length; i++) {
-            if(objArr[i].name===name) {
-              return i;
-            }
-          }
-        }
-        function randomPoketmon(local, exceptName=null)
-        {
-          let poketmons = []
-          for(let i=0; i<json.poketmon.length; i++) {
-            let poketmon = json.poketmon[i];
-            if(poketmon.local === local) poketmons.push(poketmon); 
-          }
-          let ret = getRandomInt(0, poketmons.length);
-          let idx = 0;
-          while(exceptName !== null && exceptName === poketmons[ret].name) {
-            if(idx > 100) break;
-            idx++;
-            ret = getRandomInt(0, poketmons.length);
-            //console.log("randomPoketmon - name", poketmons[ret].name, " except :", exceptName, " status : ",exceptName === poketmons[ret].name)
-          }
-          return poketmons[ret];
-        }
-        function randomPersonal(poketmon) {
-          let randomIdx = getRandomInt(0,5);
-          console.log("randomPersonal : ",poketmon,randomIdx);
-          if(randomIdx === 0 || randomIdx === 1) return poketmon.personal[0]
-          else if(randomIdx === 2 || randomIdx === 3) return poketmon.personal[1]
-          else if(randomIdx === 4) return poketmon.personal[2]
-        }
-      </script>
     </div>
-    <style>
-
-    </style>
     <div id="admin">
+      <div class="frame">
+        <article>
+          <h1 class="list-header">포켓몬 지역별 등록 검색창</h1>
+          <div class="local-search">
+            <input class="input-text" type="text"/>
+            <button class="search-btn">검색</button>
+          </div>
+          <ul class="search-list">
+            <li class="search-item">피카츄</li>            
+            <li class="search-item">팬텀</li>            
+            <li class="search-item">잠만보</li>            
+          </ul>
+        </article>
+      </div>
       <div class="frame">
         <article class="article-left">
             <h1 class="list-header">포켓몬 리스트</h1>
@@ -268,7 +251,7 @@
       </div>
       <div class="frame">
         <article class="article-left">
-          <h1 class="list-header">출몰 지역 참조 리스트</h1>
+          <h1 class="list-header">출몰 지역 참조 리스트 <span class="help-text">숫자는 지역에 존재하는 포켓몬 수</span></h1>
           <div class="local-list">
           </div>
         </article>
@@ -331,7 +314,7 @@
         <button style="width: 100%;" class="delete-btn" onclick="deletePoketData('poketmon')">X</button>
       </section>
       <section class="local">
-        <span class="local-name"></span>&nbsp;&nbsp;
+        <span class="local-name"></span>&nbsp;<span class="local-count"></span>&nbsp;
         <button class="delete-btn" onclick="deletePoketData('local')">X</button>
       </section>
       <section class="spec">
@@ -341,202 +324,7 @@
       </section>
     </template>
     <script>
-      function getJsonData() {
-        var dbTestRef = firebase.database().ref('json/');
-        console.log("ㅎㄷㅅ",json);
-        dbTestRef.on('value', function(data){
-          //console.log("getJsonData : ", json, data.val());
-          if(data.val()) {
-            json=JSON.parse(data.val());//saveGlobalData( JSON.parse(data.val()) );
-            console.log("getJsonData 성공했습니다");
-          }
-        })
-      }
-      
-      async function initAdminPage() {
-        getJsonData();
-        await sleep(2000);
-        let template = document.querySelector("template").content;
-        initPoketAdmin(template);
-        initLocalAdmin(template);
-        initSpecAdmin(template);
-      }
-
-      async function initPoketAdmin(template=null) {
-        if(!template) template=document.querySelector("template").content;
-        /*포켓몬 리스트 초기화*/
-        let list = document.querySelector(".poketmon-list");
-        let dom_template = template.querySelector(".poketmon");
-        console.log("포켓몬 리스트 초기화 시작", json);
-        for(var i=0; i<json.poketmon.length; i++) {
-          list.appendChild(await nodePoketmon(json.poketmon[i], dom_template));
-        }
-      }
-      async function nodePoketmon(poketmon, templateNode=null) {
-        if(!templateNode) {
-          templateNode = document.querySelector("template").content.querySelector(".poketmon");
-        }
-        let dom = templateNode.cloneNode(true);
-        dom.querySelector(".poket-img").style.backgroundImage= "url('"+await firebaseGetFileUrl(poketmon.image)+"')";
-        dom.querySelector(".poket-name").innerText = poketmon.name;
-        dom.querySelector(".poket-local").innerText = poketmon.local;
-        dom.querySelector(".poket-type").innerText = poketmon.type;
-        dom.querySelector(".poket-personal").innerText = poketmon.personal[0]+","+poketmon.personal[1];
-        dom.querySelector(".poket-personal-hidden").innerText = poketmon.personal[2];
-        return dom;
-      }
-      function initLocalAdmin(template=null) {
-        if(!template) template=document.querySelector("template").content;
-        list = document.querySelector(".local-list");
-        dom_template = template.querySelector(".local");
-        console.log("성격 리스트 초기화 시작", list, dom_template, json.local);
-        
-        for(var i=0; i<json.local.length; i++) {    
-          list.appendChild(nodeLocal(json.local[i],dom_template));
-        }
-      }
-      function nodeLocal(local, templateNode=null) {
-        if(!templateNode) {
-          templateNode = document.querySelector("template").content.querySelector(".local");
-        }
-        let dom = templateNode.cloneNode(true);
-        let name = local.name;
-        dom.querySelector(".local-name").innerText = name;
-        return dom;
-      }
-      function initSpecAdmin(template=null) {
-        if(!template) template=document.querySelector("template").content;
-        list = document.querySelector(".spec-list");
-        dom_template = template.querySelector(".spec");
-        console.log("성격 리스트 초기화 시작", list, dom_template, json.spec);
-        
-        for(var i=0; i<json.spec.length; i++) {
-          list.appendChild(nodeSpec(json.spec[i],dom_template));
-        }
-      }
-      function nodeSpec(spec, templateNode=null) {
-        if(!templateNode) {
-          templateNode = document.querySelector("template").content.querySelector(".spec");
-        }
-        let dom = templateNode.cloneNode(true);
-        let name = spec.name;
-        dom.querySelector(".spec-name").innerText = name;
-        return dom;
-      }
-
       initAdminPage();
-      async function addPoketmon() {
-        if(json == null) {
-          console.log("입력데이터가 없습니다.");
-          getJsonData();
-          await sleep(1000);
-        }
-        let file = document.querySelector('#image-poketmon');
-        let name = document.querySelector('.add-poketname .input-text');
-        let local = document.querySelector('.add-local .input-text');
-        let type = document.querySelector('.add-poket-type .input-text');
-        let personal = document.querySelectorAll('.add-poketmon .add-personal input');
-
-        let imgPath = 'image/'+name.value;
-        firebaseSaveFile(imgPath, file.files[0]);
-
-        let poketmon = {
-          name : name.value,
-          image : imgPath,
-          local : local.value,
-          type : type.value,
-          personal : [personal[0].value, personal[1].value, personal[2].value]
-        }
-        
-        json.poketmon.push(poketmon);
-        firebaseSaveJson(json);
-
-        name.value='';
-        console.log("포켓몬 추가 완료",json);
-        refreshAdmin("poketmon");
-      }
-
-      async function addLocal() {
-        if(json == null) {
-          console.log("입력데이터가 없습니다.");
-          getJsonData();
-          await sleep(1000);
-        }
-        let name = document.querySelector('add-local-name .input-text');
-        let local = {
-          name : name.value
-        }
-        json.local.push(local);
-        firebaseSaveJson(json);
-
-        name.value='';
-        console.log("특성 추가 완료",json);
-        refreshAdmin("personal");
-      }
-      async function addSpec() {
-        if(json == null) {
-          console.log("입력데이터가 없습니다.");
-          getJsonData();
-          await sleep(1000);
-        }
-        let name = document.querySelector('.add-spec-name .input-text');
-        let spec = {
-          name : name.value
-        }
-        json.spec.push(spec);
-        firebaseSaveJson(json);
-
-        name.value='';
-        console.log("특성 추가 완료",json);
-        refreshAdmin("spec");
-      }
-      
-      function deletePoketData(type) {
-        let target = event.target.parentNode;
-        let idx = getDomIndex(target)-1;
-        target.remove();
-        
-        if(type=="poketmon") {
-          json.poketmon.splice(idx,1);
-        }
-        else if(type=="spec") {
-          json.spec.splice(idx,1);
-        }
-        else if(type=="local") {
-          json.local.splice(idx,1);
-        }
-        console.log("deletePoketData 완료 : ",json);
-        firebaseSaveJson(json);
-      }
-
-      async function refreshAdmin(type) {
-        getJsonData();
-        await sleep(1000);
-        if(type=="poketmon") {
-          let parentNode = document.querySelector(".poketmon-list");
-          let childLen = parentNode.childElementCount;
-          for(let i=childLen; i<json.poketmon.length; i++) {
-            let dom = await nodePoketmon(json.poketmon[i]);
-            parentNode.appendChild(dom);
-          }
-        }
-        else if(type="spec") {
-          let parentNode = document.querySelector(".spec-list");
-          let childLen = parentNode.childElementCount;
-          for(let i=childLen; i<json.personal.length; i++) {
-            let dom = nodeSpec(json.personal[i]);
-            parentNode.appendChild(dom);
-          }
-        }
-        else if(type="local") {
-          let parentNode = document.querySelector(".local-list");
-          let childLen = parentNode.childElementCount;
-          for(let i=childLen; i<json.spec.length; i++) {
-            let dom = nodePersonal(json.spec[i]);
-            parentNode.appendChild(dom);
-          }
-        }
-      }
       changeMenu('main');
     </script>
   </body>

@@ -110,7 +110,7 @@ article {
     overflow-y: scroll;
     border: 1px solid black;
 }
-  .spec {
+.spec {
     display: inline-block;
     width: 150px;
 }
@@ -125,9 +125,12 @@ article {
 }
 .local {
     display: inline-block;
-    width: 200px;
+    width: 240px;
 }
 .local button {
     float: right;
     margin-right: 5px;
+}
+.help-text {
+    font-size: 10px;
 }
