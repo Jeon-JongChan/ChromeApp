@@ -1,15 +1,3 @@
-function getJsonData() {
-    var dbTestRef = firebase.database().ref('json/');
-    console.log("ㅎㄷㅅ",json);
-    dbTestRef.on('value', function(data){
-      //console.log("getJsonData : ", json, data.val());
-      if(data.val()) {
-        json=JSON.parse(data.val());//saveGlobalData( JSON.parse(data.val()) );
-        console.log("getJsonData 성공했습니다");
-      }
-    })
-  }
-  
   async function initAdminPage() {
     getJsonData();
     await sleep(2000);
@@ -83,12 +71,16 @@ function getJsonData() {
     dom.querySelector(".spec-name").innerText = name;
     return dom;
   }
-  async function addPoketmon() {
+  async function beforeAddData() {
     if(json == null) {
-      console.log("입력데이터가 없습니다.");
-      getJsonData();
-      await sleep(1000);
+      console.log("화면로딩에 필요한 데이터가 존재하지 않습니다.");
     }
+    getJsonData();
+    await sleep(1000);
+  }
+  async function addPoketmon() {
+    await beforeAddData();
+    
     let file = document.querySelector('#image-poketmon');
     let name = document.querySelector('.add-poketname .input-text');
     let local = document.querySelector('.add-local .input-text');
@@ -118,11 +110,8 @@ function getJsonData() {
   }
 
   async function addLocal() {
-    if(json == null) {
-      console.log("입력데이터가 없습니다.");
-      getJsonData();
-      await sleep(1000);
-    }
+    await beforeAddData();
+    
     let name = document.querySelector('add-local-name .input-text');
     let local = {
       name : name.value
@@ -135,11 +124,8 @@ function getJsonData() {
     refreshAdmin("personal");
   }
   async function addSpec() {
-    if(json == null) {
-      console.log("입력데이터가 없습니다.");
-      getJsonData();
-      await sleep(1000);
-    }
+    await beforeAddData();
+    
     let name = document.querySelector('.add-spec-name .input-text');
     let spec = {
       name : name.value
@@ -152,7 +138,8 @@ function getJsonData() {
     refreshAdmin("spec");
   }
   
-function deletePoketData(type) {
+  function deletePoketData(type) {
+    getJsonData();
     let target = event.target.parentNode;
     let idx = getDomIndex(target)-1;
     target.remove();
@@ -162,10 +149,10 @@ function deletePoketData(type) {
       if(poketmon.length > 0) rewriteLocalCount(poketmon[0].local);
     }
     else if(type=="spec") {
-        json.spec.splice(idx,1);
+      json.spec.splice(idx,1);
     }
     else if(type=="local") {
-        json.local.splice(idx,1);
+      json.local.splice(idx,1);
     }
     console.log("deletePoketData 완료 : ",json);
     firebaseSaveJson(json);
@@ -212,7 +199,9 @@ function rewriteLocalCount(localName) {
     let idx = getNameIdx(json.local, localName);
     console.log("rewriteLocalCount - ",localName," 카운트 수정중... idx : ", idx);
     let localNode = document.querySelectorAll(".local-list .local")[idx];
-    let poketCount = localPoketCount(localName);
-    localNode.querySelector(".local-count").innerText = "( "+poketCount+" )";
-
+    if(localNode)
+    {
+      let poketCount = localPoketCount(localName);
+      localNode.querySelector(".local-count").innerText = "( "+poketCount+" )";
+    }
 }

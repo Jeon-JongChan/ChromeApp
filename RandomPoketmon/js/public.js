@@ -3,12 +3,12 @@ function sleep(ms) {
         setTimeout(resolve, ms);
     })
 }
-function getDomIndex(dom) {
-    var elem = dom.parentNode;
+function getDomIndex(dom, elem=null) {
+    if(!elem) elem = dom.parentNode;
     var idx = null;
-    for(var i = 0; i < elem.childNodes.length; i++) {
+    for(var i = 1; i < elem.childNodes.length; i++) {
       if (elem.childNodes[i] === dom) {
-        //console.log(elem, elem.childNodes[i],'elemIndex = ', i);
+        //console.log(elem, elem.childNodes[i],dom,'elemIndex = ', i);
         idx = i;
         break;
       }
@@ -32,6 +32,7 @@ function getNameIdx(objArr, name)
         return i;
       }
     }
+    return -1;
 }
 function copyToClipBoard(query) {
     var content = document.querySelector(query).innerText;
