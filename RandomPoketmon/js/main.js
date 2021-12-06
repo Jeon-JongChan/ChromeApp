@@ -90,8 +90,23 @@ function changeMenu(menu) {
         poketmons.push(poketmon); 
       }
     }
+    let temp = poketmons;
+    poketmons = poketmonRandomSort(poketmons);
+    console.log('randomPoketmon : ',temp,'->',poketmons);
     if(poketmons.length === 0) return ret;
     ret = getPoketmon(poketmons);
+    return ret;
+  }
+  function poketmonRandomSort(poketmons) {
+    let limit=0;
+    let ret = [];
+
+    while(poketmons.length > 0) {
+      limit += 1;
+      if(limit > 1000) break;
+      let idx = getRandomInt(0, poketmons.length);
+      ret.push(poketmons.splice(idx,1)[0]);
+    }
     return ret;
   }
   function getPoketmon(poketmons) {
@@ -99,7 +114,7 @@ function changeMenu(menu) {
       let limit = 0;
       while(!ret) {
           limit++;
-          if(limit > 500) break;
+          if(limit > 1000) break;
           for(let i=0; i<poketmons.length; i++) {
               let target = poketmons[i];
               let random = getRandomInt(0,100);
@@ -111,6 +126,7 @@ function changeMenu(menu) {
       }
       return ret;
   }
+
   function randomPersonal(poketmon) {
     let randomIdx = getRandomInt(0,5);
     console.log("randomPersonal : ",poketmon,randomIdx);
