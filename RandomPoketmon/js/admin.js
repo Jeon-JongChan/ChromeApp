@@ -112,7 +112,7 @@
   async function addLocal() {
     await beforeAddData();
     
-    let name = document.querySelector('add-local-name .input-text');
+    let name = document.querySelector('.add-local-name .input-text');
     let local = {
       name : name.value
     }
@@ -121,7 +121,8 @@
 
     name.value='';
     console.log("특성 추가 완료",json);
-    refreshAdmin("personal");
+    refreshAdmin("local");
+    rewriteLocalCount(local.name);
   }
   async function addSpec() {
     await beforeAddData();

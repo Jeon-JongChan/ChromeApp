@@ -2,13 +2,52 @@
 <head>
     <style>
         BODY {width: 520px; min-height: 250px;}
+        .btn-start {
+            margin-top: 12px;
+            width: 100%;
+        }
+        .url {
+
+        }
+        #target-url {width: 80%;}
+        #start {
+            width: 100%;
+            background-color: white;
+        }
+        nav {
+            height: 40px;
+        }
+        .nav-item {
+            border: 1px solid black;
+            padding: 10px;
+        }
     </style>
     <script defer src="popup.js"></script>
 </head>
 <body>
     <h1>Ticket Macro</h1>
-    <button id="start">START</button>
-    <input id="target-url"type="text">
+    <div class="main">
+        <nav>
+            <a class="nav-item">INTERPARK</a>
+            <a class="nav-item">INTER</a>
+            <a class="nav-item">PARK</a>
+        </nav>
+        <div id="interpark">
+            <div class="url">
+                <label for="target-url">TICKET URL</label>
+                <input id="target-url"type="text">
+            </div>
+            <div class="date">
+                <label for="target-date">Date</label>
+                <input id="target-date"type="number" placeholder="공백일경우 자동선택됩니다.">
+            </div>
+
+            <div class="btn-start">
+                <button id="start">START</button>
+            </div>
+        </div>
+    </div>
+
     <button id="test">TEST</button>
 </body>
 </html>
