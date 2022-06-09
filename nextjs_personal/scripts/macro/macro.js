@@ -23,13 +23,14 @@ const macro = {
     macro : async () => {
       let page = await macro.getPage();
       if(!page) return;
+      await macro.page.goto('https://ticket.interpark.com');
       /* 로그인 여부를 확인하고 해야한다면 로그인을 실행한다. */
       // 로그인 텍스트가 로딩 될 때까지 시간지연 필요
       await page.waitForSelector('#imgLogin');
       let loginText = await page.$eval('#imgLogin', (dom)=> {
         return dom.innerText;
       })
-      if(loginText === '로그인') macro.login()
+      if(loginText === '로그인') macro.login(page)
       
     },
     login : async (page) => {
@@ -49,7 +50,7 @@ const macro = {
       macro.browser = null;
       macro.page = null;
     },
-    getPage : async () => {
+    getPage : () => {
       if(!macro.page && macro.reloadCnt < 3) {
         macro.reloadCnt += 1; 
         console.log('page is null - macro.macro() line 1. reload count : ', macro.reloadCnt);

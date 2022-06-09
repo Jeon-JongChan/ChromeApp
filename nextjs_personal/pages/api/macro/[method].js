@@ -1,7 +1,11 @@
-import macro from '../../../server/macro'
+import macro from '../../../scripts/macro/macro'
 export default function handler(req, res) {
     let method = req.query.method;
-    console.log("api 실행 :"+method);
+    let url = req.body.url;
+    console.log("api 실행 :"+method, req.body);
+    if(!url) {
+        res.status(200).json({ status: 'Fail. Undefined URL' });
+    }
     if(method === 'start') {
         macro.start();
         res.status(200).json({ status: 'John Doe' });
