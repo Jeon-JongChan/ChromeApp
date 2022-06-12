@@ -6,8 +6,7 @@ export default function Test(props) {
     let [url, setUrl] = useState('');
     const testMacro = async (method) => {
         setUrl(document.querySelector('#macro-url').value);
-        console.log(url);
-        if(method !== 'test') {
+        if(method == 'test') {
             await api.fetchPostJson('/api/macro/start',{url : url});
         }  
     }
