@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer-core');
 
-const BROSER_PATH=process.env.BROWSER_PATH;
+const BROWSER_PATH=process.env.BROWSER_PATH;
 const IPARK_ID=process.env.INTERPARK_ID;
 const IPARK_PASSWORD=process.env.INTERPARK_PASSWORD;
 
@@ -11,7 +11,7 @@ const macro = {
     start : async () => {
       const browser = macro.browser || await puppeteer.launch({
         headless: false,
-        executablePath: BROSER_PATH
+        executablePath: BROWSER_PATH
       });
       macro.browser = browser
       // console.log("macro browser : ",macro.browser);

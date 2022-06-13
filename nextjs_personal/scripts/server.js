@@ -6,11 +6,19 @@ const server = {
         fs.readFile('')
     },
     saveJson : (json) => {
+        let data;
         if(!fs.existsSync(filePath)) {
-            fs.writeFile(filePath, '', (err)=>console.log(err));
+            if(!fs.existsSync('./temp')) fs.mkdirSync('./temp');
+            fs.writeFile(filePath, '', (err)=> {if(err) console.log('err : ',err)});
+            data = {};
         }
-        console.log(Object.keys(json), Object.values(json))
-        fs.writeFileSync(filePath, JSON.stringify(json));
+        else data = JSON.parse(fs.readFileSync(filePath));
+        for(var v of Object.keys(json)) {
+            // console.log(Object.keys(json), v);
+            data[v] = json[v];
+        }
+        console.log("data 읽음 : ",data, "json data : ", json);
+        fs.writeFileSync(filePath, JSON.stringify(data));
     }
 };
 export default server;

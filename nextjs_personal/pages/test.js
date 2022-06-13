@@ -7,7 +7,15 @@ export default function Test(props) {
     const testMacro = async (method) => {
         setUrl(document.querySelector('#macro-url').value);
         if(method == 'test') {
-            await api.fetchPostJson('/api/macro/start',{url : url});
+            await api.fetchPostJson('/api/macro/test',{url : url});
+            await api.fetchPostJson('/api/macro/test',{
+                test : 'test',
+                value : 'value',
+                json : {
+                    jv1 : 1,
+                    jv2 : 2,
+                } 
+            });
         }  
     }
     return (

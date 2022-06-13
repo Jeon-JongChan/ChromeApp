@@ -4,14 +4,16 @@ export default function handler(req, res) {
     let method = req.query.method;
     let url = req.body.url;
     console.log("api 실행 :"+method, req.body);
+    /*
     if(!url) {
         res.status(200).json({ status: 'Fail. Undefined URL' });
         return;
     }
-    else {
-        console.log("url 저장");
-        server.saveJson({url: url});
-    }
+    */
+    console.log("파일 저장 : ", req.body);
+    server.saveJson(req.body);
+    res.status(200).json({ status: 'Fail. Undefined URL' });
+    
 
     if(method === 'start') {
         macro.start();
