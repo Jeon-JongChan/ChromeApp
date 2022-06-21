@@ -2,8 +2,15 @@
 const fs = require('fs');
 const filePath='./temp/data.json';
 const server = {
-    readJson : () => {
-        fs.readFile('')
+    readJson : (key) => {
+        if(!fs.existsSync(filePath)) {
+            return null;
+        }
+        else {
+            data = JSON.parse(fs.readFileSync(filePath));
+            if(key) return data[key];
+        }
+        return data;
     },
     saveJson : (json) => {
         let data;
@@ -19,6 +26,21 @@ const server = {
         }
         console.log("data 읽음 : ",data, "json data : ", json);
         fs.writeFileSync(filePath, JSON.stringify(data));
+    },
+    removeJson : (key) => {
+        if(!key) {
+            console.log('key is undefined');
+            return null;
+        }
+        let data = server.readJson();
+        let json = {};
+        for(var v of Object.keys(data)) {
+            if(v == key) {
+                console.log(key+' is delete');
+                continue;
+            }
+            json[v] = data[v];
+        }
     }
 };
 export default server;

@@ -11,9 +11,11 @@ export default function Test(props) {
             await api.fetchPostJson('/api/macro/test',{
                 test : 'test',
                 value : 'value',
+                only : 'freiends',
                 json : {
                     jv1 : 1,
-                    jv2 : 2,
+                    jv2 : 5,
+                    jv3 : 2,
                 } 
             });
         }  
