@@ -32,15 +32,16 @@ const server = {
             console.log('key is undefined');
             return null;
         }
-        let data = server.readJson();
-        let json = {};
-        for(var v of Object.keys(data)) {
+        let json = server.readJson();
+        let data = {};
+        for(var v of Object.keys(json)) {
             if(v == key) {
                 console.log(key+' is delete');
                 continue;
             }
-            json[v] = data[v];
+            data[v] = json[v];
         }
+        fs.writeFileSync(filePath, JSON.stringify(data));
     }
 };
 export default server;

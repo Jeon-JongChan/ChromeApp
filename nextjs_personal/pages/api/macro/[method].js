@@ -10,7 +10,7 @@ export default function handler(req, res) {
         return;
     }
     */
-    console.log("파일 저장 : ", req.body);
+    //console.log("파일 저장 : ", req.body);
     server.saveJson(req.body);
     res.status(200).json({ status: 'Fail. Undefined URL' });
     
