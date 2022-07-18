@@ -5,22 +5,15 @@ import api from "../scripts/common"
 export default function Test(props) {
     let [url, setUrl] = useState('');
     const testMacro = async (method) => {
-        setUrl(document.querySelector('#macro-url').value);
+        inputUrl = document.querySelector('#macro-url').value;
+        setUrl(inputUrl);
         if(method == 'test') {
             await api.fetchPostJson('/api/macro/test',{url : url});
-            await api.fetchPostJson('/api/macro/test',{
-                test : 'test',
-                value : 'value',
-                only : 'freiends',
-                json : {
-                    jv1 : 1,
-                    jv2 : 5,
-                    jv3 : 2,
-                } 
-            });
-        }  
+        }
     }
+    const getMacro = async () 
     return (
+        <>
         <div>
             <pre>
                 test 화면입니다.
@@ -42,5 +35,9 @@ export default function Test(props) {
             </button>
             <div><span>{url ? '매크로에 지정된 url : '+url : '매크로 작동 x'}</span></div>
         </div>
+        <style jsx>{`
+        
+        `}</style>
+        </>
     )
 }
