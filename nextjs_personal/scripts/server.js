@@ -2,44 +2,55 @@
 const fs = require('fs');
 const filePath='./temp/data.json';
 const server = {
-    readJson : (key) => {
+    readJson : (key,id='root') => {
         if(!fs.existsSync(filePath)) {
             return null;
         }
         else {
             data = JSON.parse(fs.readFileSync(filePath));
-            if(key) return data[key];
+            if(!data[id]) {
+                console.log("readJson > 해당 id로 저장된 데이터가 없습니다.");
+                return null;
+            }
+            if(key) return data[id][key];
         }
-        return data;
+        return null;
     },
-    saveJson : (json) => {
+    saveJson : (json, id='root') => {
         let data;
         if(!fs.existsSync(filePath)) {
             if(!fs.existsSync('./temp')) fs.mkdirSync('./temp');
             fs.writeFile(filePath, '', (err)=> {if(err) console.log('err : ',err)});
             data = {};
+
         }
         else data = JSON.parse(fs.readFileSync(filePath));
+        if(!data[id]) data[id] = {};
+        console.log("saveJson",json, Object.keys(json));
         for(var v of Object.keys(json)) {
-            // console.log(Object.keys(json), v);
-            data[v] = json[v];
+            console.log(id, Object.keys(json), v,json[v],data[id]);
+            data[id][v] = json[v];
         }
-        console.log("data 읽음 : ",data, "json data : ", json);
+        //console.log("data 읽음 : ",data, "json data : ", json);
         fs.writeFileSync(filePath, JSON.stringify(data));
     },
-    removeJson : (key) => {
+    removeJson : (key, id='root') => {
         if(!key) {
-            console.log('key is undefined');
+            console.log('removeJson > key is undefined');
             return null;
         }
         let json = server.readJson();
         let data = {};
-        for(var v of Object.keys(json)) {
+        if(!json[id]) {
+            console.log("removeJson > 해당 id로 저장된 데이터가 없습니다.");
+            return null;
+        }
+        for(var v of Object.keys(json[id])) {
             if(v == key) {
                 console.log(key+' is delete');
                 continue;
             }
-            data[v] = json[v];
+            data[id][v] = json[id][v];
         }
         fs.writeFileSync(filePath, JSON.stringify(data));
     }

@@ -11,7 +11,8 @@ export default function handler(req, res) {
     }
     */
     //console.log("파일 저장 : ", req.body);
-    server.saveJson(req.body);
+    if(req.body?.id) server.saveJson(req.body, req.body.id);
+    else server.saveJson(req.body);
     res.status(200).json({ status: 'Fail. Undefined URL' });
     
 

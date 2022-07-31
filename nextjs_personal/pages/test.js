@@ -5,13 +5,13 @@ import api from "../scripts/common"
 export default function Test(props) {
     let [url, setUrl] = useState('');
     const testMacro = async (method) => {
-        inputUrl = document.querySelector('#macro-url').value;
+        let inputUrl = document.querySelector('#macro-url').value;
         setUrl(inputUrl);
         if(method == 'test') {
-            await api.fetchPostJson('/api/macro/test',{url : url});
+            await api.fetchPostJson('/api/macro/test',{url : url,test1:'test', test2:['3333','1111'], test3 : {test11:'11'}});
         }
     }
-    const getMacro = async () 
+    
     return (
         <>
         <div>
