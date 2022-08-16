@@ -11,8 +11,11 @@ export default function handler(req, res) {
     }
     */
     //console.log("파일 저장 : ", req.body);
-    if(req.body?.id) server.saveJson(req.body, req.body.id);
-    else server.saveJson(req.body);
+    if(req.body?.id) server.json.save(req.body, req.body.id);
+    else server.json.save(req.body);
+    
+    console.log(server.db.exec('SELECT * FROM USERS'));
+
     res.status(200).json({ status: 'Fail. Undefined URL' });
     
 
