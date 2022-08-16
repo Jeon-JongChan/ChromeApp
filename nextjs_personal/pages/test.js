@@ -11,6 +11,10 @@ export default function Test(props) {
             await api.fetchPostJson('/api/macro/test',{url : url,test1:'test', test2:['3333','1111'], test3 : {test11:'11'}});
         }
     }
+
+    const getInitdata = async () => {
+        await fetch('/api/macro/test');
+    }
     
     return (
         <>
@@ -32,6 +36,9 @@ export default function Test(props) {
             </button>
             <button onClick={()=>testMacro('test')}>
                 클라이언트 함수 테스트
+            </button>
+            <button onClick={()=>getInitdata()}>
+                init 함수 호출
             </button>
             <div><span>{url ? '매크로에 지정된 url : '+url : '매크로 작동 x'}</span></div>
         </div>
